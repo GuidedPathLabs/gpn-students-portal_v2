@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Guided Path Noida</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a192f; 
+      --surface: #112240; 
+      --border: #1e3a5f;
+      --text: #ffffff;      /* Pure White for maximum readability */
+      --subtext: #c0c0c0;   /* Bright Silver for secondary info */
+      --heading: #00e5ff;   /* Neon Cyan for focus elements */
+      --link: #ffd54f;      /* Gold for accents */
+      --muted: #8892b0;     /* Lifted from dull grey to a blue-tinted silver */
+      --good: #69ff47; 
+      --warn: #ffd54f; 
+      --bad: #ff5252;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text); /* Global text is now White */
+      font-size: 14px;
+    }
+    
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none;
+    }
+  
+    /* TOP BAR - BRIGHTER */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 14px; max-width: 900px; margin: 0 auto; position: relative; z-index: 1;
+    }
+    .brand-name { 
+      font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; font-weight: 700; 
+      color: var(--heading); text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+    }
+    .brand-sub { font-size: 0.7rem; color: var(--subtext); font-weight: 500; }
+    
+    /* ADMIN TAG */
+    .admin-tag {
+      background: rgba(255, 82, 82, 0.15); border: 1px solid var(--bad);
+      color: #ff8a8a; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; 
+      font-weight: 700; text-transform: uppercase;
+    }
+  
+    /* TABS - NEON STYLE */
+    .tabs {
+      display: flex; gap: 6px; margin-bottom: 20px; background: var(--surface);
+      padding: 6px; border-radius: 14px; border: 1.5px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 12px 6px; color: var(--subtext); 
+      font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; font-weight: 700;
+      border-radius: 10px; transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--bg); color: var(--heading); 
+      border: 1px solid var(--heading); box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+  
+    /* CARDS & TITLES */
+    .card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 18px; margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .card-title {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.9rem; font-weight: 700;
+      color: var(--link); text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 18px;
+    }
+    .card-title::after { background: var(--border); height: 2px; }
+  
+    /* STUDENT LIST - WHITE TEXT */
+    .sr-name { 
+      font-size: 1rem; color: #ffffff; font-weight: 600; font-family: 'Rajdhani', sans-serif;
+    }
+    .sr-id { font-weight: 700; color: var(--heading); }
+    .sr-meta { font-size: 0.75rem; color: var(--subtext); margin-bottom: 8px; font-weight: 400; }
+    
+    /* ATTENDANCE NAMES */
+    .att-name-text { font-size: 1rem; color: #ffffff; font-weight: 600; font-family: 'Rajdhani', sans-serif; }
+    .att-class-text { font-size: 0.75rem; color: var(--subtext); font-weight: 500; }
+  
+    /* INPUTS - HIGH CONTRAST */
+    .search-bar, .form-group input, .form-group select {
+      background: #070d19; border: 1.5px solid var(--border);
+      color: #ffffff; font-size: 0.95rem; font-weight: 500;
+    }
+    .search-bar:focus, .form-group input:focus {
+      border-color: var(--heading); box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+    }
+    .form-group label { color: var(--heading); font-weight: 700; font-size: 0.7rem; }
+  
+    /* MODAL BRIGHTNESS */
+    .modal h3 { font-size: 1.2rem; color: #ffffff; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    
+    /* STATUS MESSAGES */
+    .status-msg.loading { color: var(--heading); font-weight: 700; }
+    .status-msg.success { color: var(--good); font-weight: 700; }
+  
+    /* CONFIRMATION */
+    .confirm-box .confirm-title { font-size: 1.3rem; color: #ffffff; }
+    .confirm-box .confirm-msg { color: var(--subtext); font-size: 0.9rem; }
+  </style>
+  
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div>
+    <div class="brand-name">Guided Path Noida</div>
+    <div class="brand-sub">Admin Control Panel</div>
+  </div>
+  <div class="top-right">
+    <span class="admin-tag" id="adminName">Admin</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('students',this)">
+      <span class="t-icon">👥</span><span class="t-label">Students</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('attendance',this)">
+      <span class="t-icon">📅</span><span class="t-label">Attendance</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('leaderboard',this)">
+      <span class="t-icon">🏆</span><span class="t-label">Leaderboard</span>
+    </button>
+  </div>
+
+  <!-- ── STUDENTS ── -->
+  <div class="section active" id="sec-students">
+    <div class="card">
+      <div class="card-title">👥 All Students</div>
+      <div class="count-bar" id="studentCount">Loading students...</div>
+      <div class="search-add">
+        <input class="search-bar" id="studentSearch" placeholder="Search name, ID, class..." oninput="filterStudents()"/>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add</button>
+      </div>
+      <div class="student-list" id="studentList">
+        <div class="empty"><span class="spinner"></span> Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ATTENDANCE ── -->
+  <div class="section" id="sec-attendance">
+    <div class="card">
+      <div class="card-title">📅 Mark Attendance</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="attDate" onchange="updateDay()"/>
+        </div>
+        <div class="form-group">
+          <label>Day</label>
+          <input type="text" id="attDay" readonly/>
+        </div>
+      </div>
+      <div class="att-controls">
+        <button class="btn btn-warn" onclick="markHoliday()">🏖 Holiday</button>
+        <button class="btn btn-outline" onclick="resetAttendance()">↺ Reset</button>
+      </div>
+      <div class="att-hint">Tap student row to toggle Absent (green = Present · red = Absent)</div>
+      <div class="att-grid" id="attGrid">
+        <div class="empty">Load students first</div>
+      </div>
+      <div class="status-msg" id="attMsg"></div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" style="width:100%;" onclick="submitAttendance()">✓ Submit Attendance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LEADERBOARD ── -->
+  <div class="section" id="sec-leaderboard">
+    <div class="card">
+      <div class="card-title">🏆 Leaderboard Management</div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">
+        Update the public leaderboard with latest rankings.<br>Run this every Wednesday after test results are entered.
+      </p>
+      <button class="btn btn-primary" onclick="updateLeaderboard()">🔄 Update Leaderboard Now</button>
+      <div class="status-msg" id="lbMsg"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Current Top 10</div>
+      <div id="lbPreview"><div class="empty">Click "Update Leaderboard" to refresh</div></div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3>➕ Add New Student</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Student ID</label><input id="ns_id" placeholder="e.g. GPN081"/></div>
+      <div class="form-group"><label>Password</label><input id="ns_pw" placeholder="gpn081@2026"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2;min-width:180px;"><label>Full Name</label><input id="ns_name" placeholder="Student Name"/></div>
+      <div class="form-group"><label>Sex</label><select id="ns_sex"><option value="M">Male</option><option value="F">Female</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Father's Name</label><input id="ns_fn" placeholder="Father Name"/></div>
+      <div class="form-group"><label>Phone</label><input id="ns_ph" placeholder="9999999999"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Class</label><input id="ns_cls" placeholder="Class 10-A"/></div>
+      <div class="form-group"><label>School</label><input id="ns_sch" placeholder="School Name"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Date of Joining</label><input id="ns_doj" type="date"/></div>
+      <div class="form-group"><label>Fees Amount (₹)</label><input id="ns_fees" placeholder="2000" type="number"/></div>
+    </div>
+    <div class="status-msg" id="addMsg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="confirmResolve(false)">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="confirmResolve(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL3Kw6D2k5yU0LFeRI7ch-UQquvJ8EgxknjmcMWjRRRUHeuj92W5QKRBD9rlkj9FTzrQ/exec";
+const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+// ── AUTH ──
+const adminRaw = sessionStorage.getItem('gpn_admin');
+if (!adminRaw) { window.location.assign('index.html'); }
+const adminData = JSON.parse(adminRaw || '{}');
+const adminNameEl = document.getElementById('adminName');
+if(adminNameEl) adminNameEl.textContent = adminData.name || 'Admin';
+
+let allStudents = [];
+let absentSet   = new Set();
+
+// ── DATE ──
+function updateDay() {
+  const val = document.getElementById('attDate').value;
+  if (!val) return;
+  document.getElementById('attDay').value = DAYS[new Date(val).getDay()];
+}
+
+const dateInput = document.getElementById('attDate');
+if(dateInput) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+    updateDay();
+}
+
+// ── FORMAT DATE ──
+function fmtDate(v) {
+  if (!v || !String(v).trim()) return '—';
+  const s = String(v).trim();
+  if (s.match(/^\d{4}-\d{2}-\d{2}/)) {
+    const d = new Date(s);
+    if (!isNaN(d)) return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  return s;
+}
+
+// ── DYNAMIC HEIGHT ──
+function sendHeight() {
+  const h = document.documentElement.scrollHeight || document.body.scrollHeight;
+  window.parent.postMessage({ type: 'gpn-resize', height: h + 100 }, '*');
+}
+
+// ── TABS ──
+function showTab(tab, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('sec-' + tab);
+  if(target) target.classList.add('active');
+  if(btn) btn.classList.add('active');
+  
+  if (tab === 'attendance') renderAttGrid();
+  if (tab === 'leaderboard') loadLeaderboardPreview();
+  sendHeight();
+}
+
+// ── LOAD STUDENTS ──
+async function loadStudents() {
+  try {
+    const res  = await fetch(`${APPS_SCRIPT_URL}?action=getStudents`);
+    const json = await res.json();
+    if (json.status === 'success') {
+      allStudents = json.students || [];
+      renderStudents(allStudents);
+      renderAttGrid();
+    } else {
+      document.getElementById('studentList').innerHTML = `<div class="empty">Failed to load.</div>`;
+    }
+  } catch(e) {
+    document.getElementById('studentList').innerHTML = `<div class="empty">Connection error.</div>`;
+  }
+  sendHeight();
+}
+
+// ── RENDER STUDENTS (BRIGHTENED) ──
+function renderStudents(list) {
+  const el = document.getElementById('studentList');
+  const cntEl = document.getElementById('studentCount');
+  if(!el) return;
+
+  const active = list.filter(s => String(s['Status']||'').toLowerCase() === 'active').length;
+  if(cntEl) cntEl.textContent = `${active} Active Students Found`;
+
+  if (list.length === 0) { el.innerHTML = `<div class="empty">No records.</div>`; return; }
+
+  el.innerHTML = list.map(s => {
+    const isInactive = String(s['Status']||'').toLowerCase() !== 'active';
+    const fs = String(s['Fees Status']||'Due').toLowerCase();
+    const paid = fs === 'paid', late = fs === 'late';
+    const fcls = paid ? 'paid' : late ? 'late' : 'due';
+    const flbl = paid ? '✓ Paid' : late ? '⚠ Late' : '⏳ Due';
+    
+    return `
+    <div class="student-row ${isInactive?'inactive':''}">
+      <div class="sr-top">
+        <span class="sr-id">${s['StudentID']||'—'}</span>
+        <span class="sr-name" style="color:#ffffff; font-weight:600;">${s['Name']||'—'}</span>
+        <span class="sr-rank" style="color:var(--link);">#${s['Rank']||'—'}</span>
+      </div>
+      <div class="sr-meta" style="color:var(--subtext);">Class ${s['Class']||''} · ${s['School']||''}</div>
+      <div class="sr-bottom">
+        <span class="fees-badge ${fcls}">${flbl}</span>
+        ${!isInactive && !paid ? `<button class="btn btn-primary btn-sm" onclick="doMarkPaid('${s['StudentID']}')">Mark Paid</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="doRemove('${s['StudentID']}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ATTENDANCE GRID (REWARDING COLORS) ──
+function renderAttGrid() {
+  const active = allStudents.filter(s => String(s['Status']||'').toLowerCase() === 'active');
+  const grid   = document.getElementById('attGrid');
+  if (!grid || !active.length) return;
+
+  grid.innerHTML = active.map(s => {
+    const sid   = s['StudentID'];
+    const isAbs = absentSet.has(sid);
+    return `
+    <div class="att-row ${isAbs?'absent-row':''}" onclick="toggleAbsent('${sid}')">
+      <div class="att-info">
+        <div class="att-name-text" style="color:#ffffff;">${s['Name']}</div>
+        <div class="att-class-text" style="color:var(--subtext);">Class ${s['Class']}</div>
+      </div>
+      <button class="att-toggle ${isAbs?'absent':''}">${isAbs?'✗':'✓'}</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleAbsent(sid) {
+  if (absentSet.has(sid)) absentSet.delete(sid);
+  else absentSet.add(sid);
+  renderAttGrid(); // Re-render to update visual state
+  sendHeight();
+}
+
+// ── LEADERBOARD PREVIEW (BRIGHTENED) ──
+async function loadLeaderboardPreview() {
+  const el = document.getElementById('lbPreview');
+  if(!el) return;
+  try {
+    const res  = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`);
+    const json = await res.json();
+    if (json.status === 'success' && json.leaderboard.length > 0) {
+      el.innerHTML = json.leaderboard.map(s => `
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border);">
+          <div style="font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; color:var(--heading); min-width:35px;">#${s.rank}</div>
+          <div style="flex:1;">
+            <div style="font-size:1rem; color:#ffffff; font-weight:600;">${s.name}</div>
+            <div style="font-size:0.75rem; color:var(--subtext);">${s.school||''}</div>
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif; color:var(--link); font-size:1.1rem; font-weight:700;">${s.overallAvg}%</div>
+        </div>`).join('');
+    }
+  } catch(e) { el.innerHTML = `<div class="empty">Error loading rankings.</div>`; }
+  sendHeight();
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-msg ' + type;
+  el.innerHTML = type === 'loading' ? `<span class="spinner"></span> ${text}` : text;
+  sendHeight();
+}
+
+function logout() {
+  sessionStorage.removeItem('gpn_admin');
+  window.location.assign('index.html');
+}
+
+// ── INITIALIZATION ──
+window.addEventListener('load', () => {
+  loadStudents();
+  loadLeaderboardPreview();
+});
+
+// WATCHER: Automatically adjusts iframe height when content changes
+const heightObserver = new MutationObserver(() => sendHeight());
+heightObserver.observe(document.body, { childList: true, subtree: true, attributes: true });
+</script>
+
+
+</body>
+</html>
+y = false; absentSet.clear(); renderAttGrid();
+    } else { showMsg('attMsg', json.message, 'error'); }
+  } catch(e) { showMsg('attMsg','Connection error','error'); }
+  sendHeight();
+}
+
+// ── LEADERBOARD PREVIEW ──
+async function loadLeaderboardPreview() {
+  try {
+    const res  = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`);
+    const json = await res.json();
+    const el   = document.getElementById('lbPreview');
+    if (json.status === 'success' && json.leaderboard.length > 0) {
+      el.innerHTML = json.leaderboard.map(s => `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--link);min-width:28px;">#${s.rank}</div>
+          <div style="flex:1;"><div style="font-size:0.88rem;color:var(--text);">${s.name}</div>
+            <div style="font-size:0.7rem;color:var(--muted);">${s.school||''}</div></div>
+          <div style="font-family:'Rajdhani',sans-serif;color:var(--heading);font-size:0.88rem;">${s.overallAvg||''}</div>
+        </div>`).join('');
+    } else { el.innerHTML = `<div class="empty">No leaderboard data yet.</div>`; }
+  } catch(e) {}
+  sendHeight();
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-msg ' + type;
+  el.innerHTML = type === 'loading' ? `<span class="spinner"></span>${text}` : text;
+  sendHeight();
+}
+
+function logout() {
+  sessionStorage.removeItem('gpn_admin');
+  window.location.assign('index.html');
+}
+
+// ── INITIALIZATION & LISTENERS ──
+window.addEventListener('load', () => {
+  loadStudents();
+  loadLeaderboardPreview();
+  sendHeight();
+});
+
+window.addEventListener('resize', sendHeight);
+
+// THE WATCHER: Triggers every time a list item is added or changed
+const heightObserver = new MutationObserver(() => {
+  sendHeight();
+});
+heightObserver.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+</script>
+
+</body>
+</html>
+      <span class="fees-badge ${fcls}">${flbl}</span>
+        ${!isInactive && !paid ? `<button class="btn btn-primary btn-sm" onclick="doMarkPaid('${sid}','${sname}')">Mark Paid</button>` : ''}
+        ${!isInactive ? `<button class="btn btn-danger btn-sm" onclick="doRemove('${sid}','${sname}')">Remove</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  sendHeight();
+}
+
+// ── ATTENDANCE GRID ──
+function renderAttGrid() {
+  const active = allStudents.filter(s => String(s['Status']||'').toLowerCase() !== 'inactive');
+  const grid   = document.getElementById('attGrid');
+  if (!grid) return;
+  if (!active.length) { grid.innerHTML = `<div class="empty">No active students loaded yet.</div>`; return; }
+
+  grid.innerHTML = active.map(s => {
+    const sid   = s['StudentID'] || '';
+    const isAbs = absentSet.has(sid);
+    return `<div class="att-row ${isAbs?'absent-row':''}" id="arow_${sid}" onclick="toggleAbsent('${sid}')">
+      <div class="att-info">
+        <div class="att-name-text">${s['Name']||'—'}</div>
+        <div class="att-class-text">${s['Class']||''}</div>
+      </div>
+      <button class="att-toggle ${isAbs?'absent':''}" id="atb_${sid}">${isAbs?'✗':'✓'}</button>
+    </div>`;
+  }).join('');
+  sendHeight();
+}
+
+// ── CUSTOM CONFIRM, SEARCH, REMOVE, PAID, ADD LOGIC... ──
+// (Keep your existing functions for doRemove, doMarkPaid, addStudent etc. unchanged)
+
+function toggleAbsent(sid) {
+  if (absentSet.has(sid)) { absentSet.delete(sid); }
+  else { absentSet.add(sid); }
+  const btn  = document.getElementById('atb_' + sid);
+  const row  = document.getElementById('arow_' + sid);
+  const isAbs = absentSet.has(sid);
+  if (btn) { btn.classList.toggle('absent', isAbs); btn.textContent = isAbs ? '✗' : '✓'; }
+  if (row) { row.classList.toggle('absent-row', isAbs); }
+  sendHeight();
+}
+
+async function submitAttendance() {
+  const dateVal = document.getElementById('attDate').value;
+  const dayVal  = document.getElementById('attDay').value;
+  if (!dateVal) { showMsg('attMsg','Please select a date.','error'); return; }
+  const dateStr = new Date(dateVal).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  showMsg('attMsg','Saving attendance...','loading');
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify({
+      action:'markAttendance', date:dateStr, day:dayVal, holiday:isHoliday, absents:Array.from(absentSet)
+    })});
+    const json = await res.json();
+    if (json.status === 'success') {
+      showMsg('attMsg', `✓ Saved for ${dateStr}.`, 'success');
+      isHoliday = false; absentSet.clear(); renderAttGrid();
+    } else { showMsg('attMsg', json.message, 'error'); }
+  } catch(e) { showMsg('attMsg','Connection error','error'); }
+  sendHeight();
+}
+
+// ── LEADERBOARD PREVIEW ──
+async function loadLeaderboardPreview() {
+  try {
+    const res  = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`);
+    const json = await res.json();
+    const el   = document.getElementById('lbPreview');
+    if (json.status === 'success' && json.leaderboard.length > 0) {
+      el.innerHTML = json.leaderboard.map(s => `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--link);min-width:28px;">#${s.rank}</div>
+          <div style="flex:1;"><div style="font-size:0.88rem;color:var(--text);">${s.name}</div>
+            <div style="font-size:0.7rem;color:var(--muted);">${s.school||''}</div></div>
+          <div style="font-family:'Rajdhani',sans-serif;color:var(--heading);font-size:0.88rem;">${s.overallAvg||''}</div>
+        </div>`).join('');
+    } else { el.innerHTML = `<div class="empty">No leaderboard data yet.</div>`; }
+  } catch(e) {}
+  sendHeight();
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-msg ' + type;
+  el.innerHTML = type === 'loading' ? `<span class="spinner"></span>${text}` : text;
+  sendHeight();
+}
+
+function logout() {
+  sessionStorage.removeItem('gpn_admin');
+  window.location.assign('index.html');
+}
+
+// ── INITIALIZATION & LISTENERS ──
+window.addEventListener('load', () => {
+  loadStudents();
+  loadLeaderboardPreview();
+  sendHeight();
+});
+
+window.addEventListener('resize', sendHeight);
+
+// THE WATCHER: Triggers every time a list item is added or changed
+const heightObserver = new MutationObserver(() => {
+  sendHeight();
+});
+heightObserver.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+</script>
+
+</body>
+</html>
+(btn) { btn.classList.toggle('absent', isAbs); btn.textContent = isAbs ? '✗' : '✓'; }
+  if (row) { row.classList.toggle('absent-row', isAbs); }
+}
+
+function resetAttendance() {
+  absentSet.clear(); isHoliday = false;
+  renderAttGrid();
+  showMsg('attMsg','Attendance reset — all marked Present.','success');
+}
+
+function markHoliday() {
+  isHoliday = true; absentSet.clear();
+  showMsg('attMsg','📅 This day will be saved as Holiday for all students.','success');
+}
+
+async function submitAttendance() {
+  const dateVal = document.getElementById('attDate').value;
+  const dayVal  = document.getElementById('attDay').value;
+  if (!dateVal) { showMsg('attMsg','Please select a date.','error'); return; }
+  const dateStr = new Date(dateVal).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  showMsg('attMsg','Saving attendance...','loading');
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify({
+      action:'markAttendance', date:dateStr, day:dayVal, holiday:isHoliday, absents:Array.from(absentSet)
+    })});
+    const json = await res.json();
+    if (json.status === 'success') {
+      showMsg('attMsg', `✓ Saved for ${dateStr}. Absent: ${absentSet.size} student(s).`, 'success');
+      isHoliday = false; absentSet.clear(); renderAttGrid();
+    } else { showMsg('attMsg', json.message, 'error'); }
+  } catch(e) { showMsg('attMsg','Connection error','error'); }
+}
+
+// ── LEADERBOARD ──
+async function updateLeaderboard() {
+  showMsg('lbMsg','Updating leaderboard...','loading');
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify({action:'updateLeaderboard'}) });
+    const json = await res.json();
+    if (json.status === 'success') {
+      showMsg('lbMsg', `✓ Leaderboard updated with top ${json.count} students.`, 'success');
+      loadLeaderboardPreview();
+    } else { showMsg('lbMsg', json.message, 'error'); }
+  } catch(e) { showMsg('lbMsg','Connection error','error'); }
+}
+
+async function loadLeaderboardPreview() {
+  try {
+    const res  = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`);
+    const json = await res.json();
+    const el   = document.getElementById('lbPreview');
+    if (json.status === 'success' && json.leaderboard.length > 0) {
+      el.innerHTML = json.leaderboard.map(s => `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--link);min-width:28px;">#${s.rank}</div>
+          <div style="flex:1;"><div style="font-size:0.88rem;color:var(--text);">${s.name}</div>
+            <div style="font-size:0.7rem;color:var(--muted);">${s.school||''}</div></div>
+          <div style="font-family:'Rajdhani',sans-serif;color:var(--heading);font-size:0.88rem;">${s.overallAvg||''}</div>
+        </div>`).join('');
+    } else { el.innerHTML = `<div class="empty">No leaderboard data yet.</div>`; }
+  } catch(e) {}
+}
+
+// ── HELPERS ──
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-msg ' + type;
+  el.innerHTML = type === 'loading' ? `<span class="spinner"></span>${text}` : text;
+}
+
+function logout() {
+  sessionStorage.removeItem('gpn_admin');
+  window.location.assign('index.html');
+}
+
+// ── IFRAME HEIGHT ──
+function sendHeight() {
+  const topBar = document.querySelector('.top-bar');
+  const active = document.querySelector('.section.active');
+  if (!topBar || !active) return;
+  const h = topBar.offsetHeight + active.scrollHeight + 60;
+  window.parent.postMessage({ type:'gpn-resize', height: h }, '*');
+}
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
+new MutationObserver(sendHeight).observe(document.body, { childList:true, subtree:true });
+
+// ── INIT ──
+loadStudents();
+loadLeaderboardPreview();
+</script>
+</body>
+</html>

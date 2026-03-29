@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GPN Student Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+ <style>
+ :root {
+ --bg: #0a192f;
+ --surface: #112240;
+ --border: #1e3a5f;
+ --text: #e0e6ed; /* Brighter silver/white for better readability */
+ --heading: #00e5ff;
+ --link: #ffd54f;
+ --muted: #8892b0;
+ --gold: #ffcc33;
+ --silver: #e6e6e6;
+ --bronze: #cd7f32;
+ }
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ body {
+ font-family: 'DM Sans', sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ padding: 0 0 16px;
+ }
+ body::before {
+ content: ''; position: fixed; inset: 0; z-index: 0;
+ background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+ background-size: 40px 40px; pointer-events: none;
+ }
+ .wrap { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 0 16px 32px; }
+ 
+ /* BRIGHTER HEADER */
+ .lb-header { text-align: center; padding: 40px 16px 30px; }
+ .lb-header h1 {
+ font-family: 'Rajdhani', sans-serif;
+ font-size: 2.4rem;
+ font-weight: 700;
+ color: #ffffff; /* Pure white for impact */
+ text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ }
+ .lb-header .subtitle { color: var(--heading); font-weight: 500; margin-top: 8px; font-size: 0.9rem; }
+ 
+ /* PODIUM ORDERING & GLOW */
+ .podium {
+ display: flex;
+ align-items: flex-end;
+ justify-content: center;
+ gap: 12px;
+ margin-bottom: 35px;
+ }
+ .podium-item { flex: 1; text-align: center; transition: transform 0.3s ease; }
+ .podium-card {
+ border-radius: 20px;
+ padding: 20px 12px;
+ border: 1.5px solid var(--border);
+ background: var(--surface);
+ box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+ }
+ 
+ /* Specific Podium Styles */
+ .podium-item.rank1 { order: 2; } /* Middle on desktop */
+ .podium-item.rank2 { order: 1; } /* Left on desktop */
+ .podium-item.rank3 { order: 3; } /* Right on desktop */
+ 
+ .rank1 .podium-card { 
+ border-color: var(--gold); 
+ background: linear-gradient(135deg, rgba(255,204,51,0.15), rgba(17,34,64,1));
+ transform: scale(1.1);
+ box-shadow: 0 0 25px rgba(255,204,51,0.2);
+ }
+ .rank1 .podium-name { color: #ffffff; font-size: 1.2rem; }
+ 
+ /* MOBILE FIX: STACK 1, 2, 3 IN ORDER */
+ @media (max-width: 600px) {
+ .podium { flex-direction: column; align-items: center; gap: 20px; }
+ .podium-item { width: 100%; max-width: 320px; }
+ .podium-item.rank1 { order: 1 !important; }
+ .podium-item.rank2 { order: 2 !important; }
+ .podium-item.rank3 { order: 3 !important; }
+ .rank1 { transform: scale(1.05); }
+ }
+ 
+ /* BRIGHTER BADGES */
+ .lb-badges, .podium-badges {
+ display: flex;
+ flex-wrap: wrap; /* CRITICAL FIX: Stops cutting */
+ gap: 6px;
+ margin-top: 10px;
+ justify-content: center;
+ }
+ .lb-badge, .pb {
+ font-family: 'Rajdhani', sans-serif;
+ font-size: 0.7rem;
+ font-weight: 700;
+ padding: 3px 10px;
+ border-radius: 6px;
+ background: rgba(0, 229, 255, 0.15);
+ color: var(--heading);
+ border: 1px solid rgba(0, 229, 255, 0.3);
+ white-space: nowrap;
+ }
+ .rank1 .pb { background: rgba(255,204,51,0.2); color: var(--gold); border-color: var(--gold); }
+ 
+ /* LIST STYLES */
+ .lb-row {
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ padding: 16px 20px;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 15px;
+ margin-bottom: 10px;
+ }
+ .lb-name { font-size: 1.05rem; color: #ffffff; font-weight: 600; font-family: 'Rajdhani', sans-serif; }
+ .lb-score { color: var(--heading); font-size: 1.3rem; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
+ 
+ .section-title { color: var(--link); font-size: 0.9rem; margin: 30px 0 15px; }
+ </style>
+ 
+</head>
+<body>
+<div class="lb-header">
+  <div class="brand">Guided Path Noida</div>
+  <h1>🏆 Student Leaderboard</h1>
+  <div class="subtitle">Top performers — updated every Wednesday</div>
+  <div class="lb-updated" id="lastUpdated"></div>
+</div>
+
+<div class="wrap" id="lbWrap">
+  <div class="empty"><span class="spinner"></span>&nbsp; Loading leaderboard...</div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL3Kw6D2k5yU0LFeRI7ch-UQquvJ8EgxknjmcMWjRRRUHeuj92W5QKRBD9rlkj9FTzrQ/exec";
+
+// Unified badge function for cleaner code
+function renderBadges(badgeStr, isPodium) {
+  if (!badgeStr || badgeStr.trim() === "") return '';
+  const className = isPodium ? 'pb' : 'lb-badge';
+  return badgeStr.split(',')
+    .map(b => b.trim())
+    .filter(Boolean)
+    .map(b => `<span class="${className}">${b}</span>`)
+    .join('');
+}
+
+async function loadLeaderboard() {
+  const wrap = document.getElementById('lbWrap');
+  if (!wrap) return;
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`);
+    const json = await res.json();
+
+    if (json.status !== 'success' || !json.leaderboard || json.leaderboard.length === 0) {
+      wrap.innerHTML = `<div class="empty">Leaderboard not yet available.</div>`;
+      return;
+    }
+
+    // Update Date
+    const updateEl = document.getElementById('lastUpdated');
+    if (updateEl) {
+      updateEl.textContent = 'Last updated: ' + new Date().toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      });
+    }
+
+    const leaders = json.leaderboard;
+    const top3 = leaders.slice(0, 3);
+    const rest = leaders.slice(3);
+
+    // FIX: Render in 1, 2, 3 order. CSS will handle the desktop layout.
+    let html = `<div class="podium">`;
+    
+    // Rank 1
+    if (top3[0]) html += renderPodiumCard(top3[0], 'rank1', '👑', '1st Place');
+    // Rank 2
+    if (top3[1]) html += renderPodiumCard(top3[1], 'rank2', '🥈', '2nd Place');
+    // Rank 3
+    if (top3[2]) html += renderPodiumCard(top3[2], 'rank3', '🥉', '3rd Place');
+
+    html += `</div>`;
+
+    if (rest.length > 0) {
+      html += `<div class="section-title">🎯 Global Rankings</div>`;
+      html += `<div class="lb-list">`;
+      rest.forEach(s => {
+        html += `
+          <div class="lb-row">
+            <div class="lb-rank-num">#${s.rank}</div>
+            <div class="lb-info">
+              <div class="lb-name">${s.name}</div>
+              <div class="lb-school">${s.school || ''}</div>
+              <div class="lb-badges">${renderBadges(s.badges, false)}</div>
+            </div>
+            <div class="lb-score">${s.overallAvg}%</div>
+          </div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `
+      <div class="footer">
+        Guided Path Noida · 
+        <a href="https://www.guidedpathnoida.in" target="_blank">guidedpathnoida.in</a><br/>
+        Work hard. Your name could be here next week. 💪
+      </div>`;
+
+    wrap.innerHTML = html;
+    sendHeight();
+
+  } catch (e) {
+    wrap.innerHTML = `<div class="empty">Error connecting to server.</div>`;
+  }
+}
+
+function renderPodiumCard(s, rankClass, emoji, label) {
+  return `
+    <div class="podium-item ${rankClass}">
+      <div class="podium-crown">${emoji}</div>
+      <div class="podium-card">
+        <div class="podium-rank">${label}</div>
+        <div class="podium-name">${s.name}</div>
+        <div class="podium-school">${s.school || ''}</div>
+        <div class="podium-score">${s.overallAvg}%</div>
+        <div class="podium-badges">${renderBadges(s.badges, true)}</div>
+      </div>
+    </div>`;
+}
+
+// ===== HEIGHT SYNC (RELIABLE VERSION) =====
+function sendHeight() {
+  const container = document.body;
+  if (!container) return;
+  // Measure full document height
+  const h = container.scrollHeight + 50; 
+  window.parent.postMessage({ type: 'gpn-resize', height: h }, '*');
+}
+
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
+const lbObs = new MutationObserver(sendHeight);
+lbObs.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+// Start
+loadLeaderboard();
+</script>
+
+</body>
+</html>ument.body, { childList: true, subtree: true });
+</script>
+</body>
+</html>s.overallAvg}</div>
+          </div>`;
+      });
+
+      html += `</div>`;
+    }
+
+    html += `
+      <div class="footer">
+        Guided Path Noida · 
+        <a href="https://www.guidedpathnoida.in" target="_blank">guidedpathnoida.in</a><br/>
+        Work hard. Your name could be here next week. 💪
+      </div>`;
+
+    wrap.innerHTML = html;
+
+  } catch (e) {
+    document.getElementById('lbWrap').innerHTML =
+      `<div class="empty">Error loading leaderboard.</div>`;
+  }
+}
+
+
+// Load
+loadLeaderboard();
+
+// ===== HEIGHT FIX =====
+let lbLastH = 0;
+function sendHeight() {
+  const header = document.querySelector('.lb-header');
+  const wrap = document.getElementById('lbWrap');
+  if (!header || !wrap) return;
+  const h = header.offsetHeight + wrap.scrollHeight + 80;
+  if (Math.abs(h - lbLastH) > 5) {
+    lbLastH = h;
+    window.parent.postMessage({ type: 'gpn-resize', height: h }, '*');
+  }
+}
+window.addEventListener('load', sendHeight);
+setTimeout(sendHeight, 500);
+setTimeout(sendHeight, 1500); // second pass after images/fonts load
+const lbObs = new MutationObserver(sendHeight);
+lbObs.observe(document.body, { childList: true, subtree: true });
+</script>
+</body>
+</html>
