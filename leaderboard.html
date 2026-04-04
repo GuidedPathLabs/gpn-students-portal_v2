@@ -1,1 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GPN Student Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#07111f;--surface:#0f1f35;--border:#1e3a5f;--text:#e8edf2;--heading:#00e5ff;--link:#ffd54f;--muted:#7a90a8;--good:#4dff91;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:0 0 32px;min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;}
+    .wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 10px 32px;}
+    .lb-header{text-align:center;padding:28px 12px 20px;position:relative;z-index:1;}
+    .lb-header .brand{font-family:'Rajdhani',sans-serif;font-size:.85rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
+    .lb-header h1{font-family:'Rajdhani',sans-serif;font-size:1.9rem;font-weight:700;color:#fff;margin-top:6px;text-shadow:0 0 24px rgba(0,229,255,0.4);}
+    .lb-header h1 span{color:var(--heading);}
+    .lb-header .subtitle{font-size:.8rem;color:var(--muted);margin-top:5px;}
+    .lb-updated{font-size:.7rem;color:var(--muted);margin-top:3px;}
+
+    /* PODIUM */
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:26px;width:100%;}
+    .podium-item{flex:1;min-width:0;text-align:center;}
+    .podium-card{border-radius:14px;padding:14px 8px 12px;border:1px solid var(--border);}
+    .podium-item.rank1 .podium-card{background:linear-gradient(160deg,rgba(255,213,79,.22),rgba(255,160,0,.08));border-color:rgba(255,213,79,.6);box-shadow:0 0 28px rgba(255,213,79,.18);transform:scale(1.05);}
+    .podium-item.rank2 .podium-card{background:linear-gradient(160deg,rgba(0,229,255,.16),rgba(0,180,220,.05));border-color:rgba(0,229,255,.4);}
+    .podium-item.rank3 .podium-card{background:linear-gradient(160deg,rgba(205,127,50,.18),rgba(180,90,20,.06));border-color:rgba(210,150,60,.45);}
+    .podium-crown{font-size:1.9rem;line-height:1;margin-bottom:6px;}
+    .podium-item.rank1 .podium-crown{font-size:2.4rem;}
+    .podium-rank{font-family:'Rajdhani',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+    .podium-item.rank1 .podium-rank{color:#ffd54f;} .podium-item.rank2 .podium-rank{color:#00e5ff;} .podium-item.rank3 .podium-rank{color:#e8a050;}
+    .podium-name{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .podium-item.rank1 .podium-name{font-size:1rem;}
+    .podium-school{font-size:.6rem;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .podium-score{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;margin-top:7px;}
+    .podium-item.rank1 .podium-score{color:#ffd54f;font-size:1.6rem;} .podium-item.rank2 .podium-score{color:#00e5ff;} .podium-item.rank3 .podium-score{color:#e8a050;}
+    .podium-badges{margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;}
+    .pb{font-size:.56rem;padding:2px 5px;border-radius:7px;background:rgba(255,255,255,0.1);color:#e8edf2;border:1px solid rgba(255,255,255,0.12);}
+
+    /* SECTION TITLES */
+    .section-title{font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:700;color:var(--heading);text-transform:uppercase;letter-spacing:2px;margin:22px 0 12px;display:flex;align-items:center;gap:8px;}
+    .section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+    /* TOP LIST (ranks 4+) */
+    .lb-list{display:flex;flex-direction:column;gap:8px;}
+    .lb-row{display:flex;align-items:center;gap:10px;padding:13px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color .2s;}
+    .lb-row:hover{border-color:rgba(0,229,255,.25);}
+    .lb-rank-num{font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700;color:var(--heading);min-width:38px;text-align:center;flex-shrink:0;}
+    .lb-info{flex:1;min-width:0;}
+    .lb-name{font-size:.92rem;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .lb-school{font-size:.7rem;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .lb-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;}
+    .lb-badge{font-size:.62rem;padding:2px 7px;border-radius:8px;background:rgba(255,213,79,.12);color:#ffd54f;border:1px solid rgba(255,213,79,.2);}
+    .lb-score{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#ffd54f;flex-shrink:0;}
+
+    /* ALL STUDENTS SECTION */
+    .all-search{margin:14px 0 10px;display:flex;gap:8px;}
+    .search-input{flex:1;background:rgba(8,18,38,.8);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;}
+    .search-input:focus{border-color:rgba(0,229,255,.5);}
+    .search-input::placeholder{color:#3a5a7a;}
+    .all-list-wrap{max-height:420px;overflow-y:auto;border-radius:10px;border:1px solid rgba(30,58,95,.5);}
+    .all-list-wrap::-webkit-scrollbar{width:4px;}
+    .all-list-wrap::-webkit-scrollbar-track{background:rgba(8,18,38,.5);}
+    .all-list-wrap::-webkit-scrollbar-thumb{background:rgba(0,229,255,.3);border-radius:4px;}
+    .all-list{display:flex;flex-direction:column;}
+    .all-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(8,18,38,.5);border-bottom:1px solid rgba(30,58,95,.4);}
+    .all-row:last-child{border-bottom:none;}
+    .all-row:hover{background:rgba(0,229,255,.04);}
+    .all-rank{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--muted);min-width:36px;text-align:center;flex-shrink:0;}
+    .all-info{flex:1;min-width:0;}
+    .all-name{font-size:.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .all-sub{font-size:.68rem;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .all-score{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--heading);flex-shrink:0;}
+    .all-count{font-size:.7rem;color:var(--muted);text-align:center;padding:8px;background:rgba(8,18,38,.4);}
+
+    /* CACHE BADGE */
+    .cache-note{font-size:.65rem;color:var(--muted);text-align:center;margin-top:4px;}
+
+    /* STATES */
+    .empty{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(0,229,255,.2);border-top-color:var(--heading);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .footer{text-align:center;font-size:.75rem;color:var(--muted);margin-top:28px;line-height:1.9;}
+    .footer strong{color:#e8edf2;} .footer a{color:var(--link);text-decoration:none;}
+    @media(max-width:400px){
+      .podium-crown{font-size:1.5rem;} .podium-item.rank1 .podium-crown{font-size:1.9rem;}
+      .lb-header h1{font-size:1.55rem;}
+    }
+  </style>
+</head>
+<body>
+<div class="lb-header">
+  <div class="brand">Guided Path Noida</div>
+  <h1>🏆 <span>Student</span> Leaderboard</h1>
+  <div class="subtitle">Top performers — updated every Wednesday</div>
+  <div class="lb-updated" id="lastUpdated"></div>
+  <div class="cache-note" id="cacheNote"></div>
+</div>
+<div class="wrap" id="lbWrap">
+  <div class="empty"><span class="spinner"></span> Loading leaderboard...</div>
+</div>
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzO3sf2bgSstGAlpnGAEIGPkcTR7ulIWJDVxavY-uK-QUA7U12c7My4CYV3Yvn5kF4S/exec";
+const CACHE_KEY='gpn_leaderboard_cache';
+const CACHE_TTL=5*60*1000; // 5 minutes
+var allLbData=[];
+
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'—';}
+
+// Robust score formatter — handles raw fractions (0.475), percentages (47.5), strings ("47.5%")
+function formatScore(raw){
+  if(raw===null||raw===undefined||raw==='')return'0%';
+  var s=String(raw).trim();
+  // Already has % sign — strip and reformat cleanly
+  if(s.endsWith('%')) s=s.slice(0,-1);
+  var n=parseFloat(s);
+  if(isNaN(n))return'0%';
+  // Raw fraction from sheet (e.g. 0.475 stored as fraction)
+  if(n>0&&n<2) n=Math.round(n*1000)/10;
+  else n=Math.round(n*10)/10;
+  return n+'%';
+}
+
+function badgeChips(str){
+  if(!str)return'';
+  return str.split(',').map(function(b){return b.trim();}).filter(Boolean)
+    .map(function(b){return'<span class="lb-badge">'+esc(b)+'</span>';}).join('');
+}
+function podiumBadges(str){
+  if(!str)return'';
+  return str.split(',').map(function(b){return b.trim();}).filter(Boolean)
+    .map(function(b){return'<span class="pb">'+esc(b)+'</span>';}).join('');
+}
+
+// ── CACHE HELPERS ──
+function saveCache(data){
+  try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:data}));}catch(e){}
+}
+function loadCache(){
+  try{
+    var raw=sessionStorage.getItem(CACHE_KEY);
+    if(!raw)return null;
+    var obj=JSON.parse(raw);
+    if(Date.now()-obj.ts>CACHE_TTL)return null;
+    return obj;
+  }catch(e){return null;}
+}
+
+async function loadLeaderboard(){
+  var wrap=document.getElementById('lbWrap');
+
+  // Try sessionStorage cache first
+  var cached=loadCache();
+  if(cached){
+    allLbData=cached.data;
+    var ageMin=Math.floor((Date.now()-cached.ts)/60000);
+    document.getElementById('lastUpdated').textContent='Last updated: '+new Date(cached.ts).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('cacheNote').textContent='(cached '+ageMin+'m ago — refreshes every 5 min)';
+    renderAll(allLbData);
+    return;
+  }
+
+  try{
+    var res=await fetch(APPS_SCRIPT_URL+'?action=leaderboard');
+    var json=await res.json();
+    if(json.status!=='success'||!json.leaderboard||!json.leaderboard.length){
+      wrap.innerHTML='<div class="empty">Leaderboard not yet available.<br>Check back after Wednesday! 💪</div>';
+      sendHeight();return;
+    }
+    document.getElementById('lastUpdated').textContent='Last updated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('cacheNote').textContent='';
+    allLbData=json.leaderboard;
+    saveCache(allLbData);
+    renderAll(allLbData);
+  }catch(e){
+    wrap.innerHTML='<div class="empty">Could not load leaderboard. Please refresh.</div>';
+    sendHeight();
+  }
+}
+
+function renderAll(leaders){
+  var wrap=document.getElementById('lbWrap');
+
+  // ── PODIUM (top 3 by position, not by rank number) ──
+  // Position 0=highest scorer, 1=second, 2=third regardless of tie
+  var p0=leaders[0]||null, p1=leaders[1]||null, p2=leaders[2]||null;
+
+  // Podium display order: 2nd LEFT, 1st CENTRE, 3rd RIGHT
+  var slots=p1?[p1,p0,p2].filter(Boolean):[p0].filter(Boolean);
+  var slotClasses=p1?['rank2','rank1','rank3']:['rank1'];
+  var slotCrowns=p1?['🥈','🥇','🥉']:['🥇'];
+
+  // Rank label — use actual rank number from API
+  function podiumLabel(s,slotIdx){
+    if(!s)return'';
+    var r=parseInt(s.rank)||slotIdx+1;
+    return r===1?'1st Place':r===2?'2nd Place':'3rd Place';
+  }
+
+  var html='<div class="podium">';
+  slots.forEach(function(s,i){
+    html+='<div class="podium-item '+slotClasses[i]+'"><div class="podium-card">'+
+      '<div class="podium-crown">'+slotCrowns[i]+'</div>'+
+      '<div class="podium-rank">'+podiumLabel(s,i)+'</div>'+
+      '<div class="podium-name">'+esc(s.name)+'</div>'+
+      '<div class="podium-school">'+esc(s.school)+'</div>'+
+      '<div class="podium-score">'+formatScore(s.overallAvg)+'</div>'+
+      (s.badges?'<div class="podium-badges">'+podiumBadges(s.badges)+'</div>':'')+
+    '</div></div>';
+  });
+  html+='</div>';
+
+  // ── RANKS 4–10 (or whatever follows top 3 positions) ──
+  var rest=leaders.slice(3,10);
+  if(rest.length){
+    var lastRank=rest[rest.length-1].rank;
+    html+='<div class="section-title">🎯 Ranks 4–'+lastRank+'</div><div class="lb-list">';
+    rest.forEach(function(s){
+      html+='<div class="lb-row">'+
+        '<div class="lb-rank-num">#'+esc(String(s.rank))+'</div>'+
+        '<div class="lb-info"><div class="lb-name">'+esc(s.name)+'</div><div class="lb-school">'+esc(s.school)+'</div>'+
+        (s.badges?'<div class="lb-badges">'+badgeChips(s.badges)+'</div>':'')+
+        '</div><div class="lb-score">'+formatScore(s.overallAvg)+'</div></div>';
+    });
+    html+='</div>';
+  }
+
+  // ── ALL STUDENTS — scrollable, searchable ──
+  html+='<div class="section-title">📋 All Students — '+leaders.length+' ranked</div>';
+  html+='<div class="all-search"><input class="search-input" id="allSearch" placeholder="🔍 Search by name or class..." oninput="filterAll(this.value)"/></div>';
+  html+='<div class="all-count" id="allCount">Showing all '+leaders.length+' students</div>';
+  html+='<div class="all-list-wrap"><div class="all-list" id="allStudentList">';
+  leaders.forEach(function(s){
+    var r=parseInt(s.rank)||0;
+    var rankColor=r===1?'color:#ffd54f;':r===2?'color:#00e5ff;':r===3?'color:#e8a050;':'';
+    var scoreColor=r<=3?'color:#ffd54f;':'';
+    html+='<div class="all-row" data-name="'+esc(String(s.name||'').toLowerCase())+'" data-cls="'+esc(String(s.cls||'').toLowerCase())+'" data-sid="'+esc(String(s.sid||'').toLowerCase())+'">'+
+      '<div class="all-rank" style="'+rankColor+'">#'+esc(String(s.rank))+'</div>'+
+      '<div class="all-info">'+
+        '<div class="all-name">'+esc(s.name)+'</div>'+
+        '<div class="all-sub">'+esc(s.cls)+(s.school?' · '+esc(s.school):'')+'</div>'+
+      '</div>'+
+      '<div class="all-score" style="'+scoreColor+'">'+formatScore(s.overallAvg)+'</div>'+
+    '</div>';
+  });
+  html+='</div></div>';
+
+  html+='<div class="footer"><strong>Guided Path Noida</strong> &nbsp;·&nbsp; <a href="https://www.guidedpathnoida.in" target="_blank">guidedpathnoida.in</a><br>Work hard. Your name could be here next week. 💪</div>';
+  wrap.innerHTML=html;
+  setTimeout(sendHeight,120);
+}
+
+function filterAll(q){
+  var rows=document.querySelectorAll('#allStudentList .all-row');
+  var ql=q.toLowerCase().trim();
+  var visible=0;
+  rows.forEach(function(r){
+    var show=!ql||r.dataset.name.includes(ql)||r.dataset.cls.includes(ql)||r.dataset.sid.includes(ql);
+    r.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  var countEl=document.getElementById('allCount');
+  if(countEl)countEl.textContent=ql?'Showing '+visible+' of '+allLbData.length+' students':'Showing all '+allLbData.length+' students';
+  setTimeout(sendHeight,80);
+}
+
+// HEIGHT REPORTING
+var lbLastH=0;
+function sendHeight(){
+  var header=document.querySelector('.lb-header');
+  var wrap=document.getElementById('lbWrap');
+  if(!header||!wrap)return;
+  var h=header.offsetHeight+wrap.scrollHeight+120;
+  if(Math.abs(h-lbLastH)>4){lbLastH=h;window.parent.postMessage({type:'gpn-resize',height:h},'*');}
+}
+window.addEventListener('load',sendHeight);
+window.addEventListener('resize',sendHeight);
+setTimeout(sendHeight,500);setTimeout(sendHeight,1500);
+new MutationObserver(function(){setTimeout(sendHeight,100);}).observe(document.body,{childList:true,subtree:true});
+loadLeaderboard();
+</script>
+</body>
+</html>
 
