@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
+  <title>Admin Panel — Guided Path Noida</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#0a192f;font-family:'DM Sans',sans-serif;color:#c0c0c0;font-size:15px;position:relative;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 15% 25%,rgba(0,229,255,0.11) 0%,transparent 55%),radial-gradient(ellipse at 85% 75%,rgba(255,213,79,0.07) 0%,transparent 50%);animation:ambientPulse 10s ease-in-out infinite alternate;pointer-events:none;}
+    @keyframes ambientPulse{0%{opacity:.7;}100%{opacity:1;}}
+    body::after{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;max-width:1000px;margin:12px auto 0;background:rgba(13,27,55,0.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:12px;border:1px solid rgba(0,229,255,0.18);box-shadow:0 8px 32px -8px rgba(0,0,0,0.5);position:relative;z-index:10;}
+    .brand-name{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,#00e5ff,#67f0ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .brand-sub{font-size:.65rem;color:#5a7a9a;margin-top:2px;}
+    .top-right{display:flex;align-items:center;gap:10px;}
+    .admin-tag{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.35);color:#00e5ff;padding:4px 12px;border-radius:8px;font-size:.72rem;font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .logout-btn{background:rgba(255,213,79,0.08);border:1px solid rgba(255,213,79,0.4);color:#ffd54f;font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px;padding:7px 14px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s;}
+    .logout-btn:active{background:rgba(255,213,79,0.2);transform:scale(.97);}
+    .wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:0 14px 28px;}
+    /* TABS */
+    .tabs{display:flex;gap:4px;margin:14px 0 12px;background:rgba(13,27,55,0.7);backdrop-filter:blur(12px);padding:5px;border-radius:12px;border:1px solid rgba(0,229,255,0.15);flex-wrap:nowrap;overflow-x:auto;}
+    .tab-btn{flex:1;min-width:0;padding:9px 4px;background:transparent;border:1px solid transparent;color:#5a7a9a;font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+    .tab-btn .t-icon{font-size:.95rem;}
+    .tab-btn.active{background:rgba(0,229,255,0.12);color:#00e5ff;border-color:rgba(0,229,255,0.3);}
+    /* CARDS */
+    .card{background:rgba(13,27,55,0.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(0,229,255,0.18);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px -8px rgba(0,0,0,0.45);}
+    .card-title{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;color:#ffd54f;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(30,58,95,.8),transparent);}
+    .section{display:none;} .section.active{display:block;}
+    /* SUMMARY */
+    .summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+    .sum-card{background:rgba(8,18,38,0.6);border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(0,229,255,0.15);}
+    .sum-card.green{border-color:rgba(105,255,71,0.3);background:rgba(105,255,71,0.04);}
+    .sum-card.red{border-color:rgba(255,82,82,0.3);background:rgba(255,82,82,0.04);}
+    .sum-card.yellow{border-color:rgba(255,213,79,0.3);background:rgba(255,213,79,0.04);}
+    .sum-card.blue{border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.04);}
+    .sc-label{font-size:.6rem;color:#7a95b0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+    .sc-val{font-family:'Rajdhani',sans-serif;font-size:1.35rem;font-weight:700;line-height:1;}
+    .sum-card.green .sc-val{color:#69ff47;} .sum-card.red .sc-val{color:#ff8a80;} .sum-card.yellow .sc-val{color:#ffd54f;} .sum-card.blue .sc-val{color:#00e5ff;}
+    .sc-sub{font-size:.58rem;color:#5a7a9a;margin-top:4px;}
+    /* MONTHLY TOTAL STRIP */
+    .monthly-total{display:flex;align-items:center;justify-content:space-between;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;}
+    .mt-label{font-size:.75rem;color:#7a95b0;text-transform:uppercase;letter-spacing:.5px;}
+    .mt-val{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:#00e5ff;}
+    /* FEE CARDS */
+    .fee-cards-wrap{display:flex;flex-direction:column;gap:10px;}
+    .fee-card{background:rgba(8,18,38,0.55);border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;}
+    .fee-card.status-paid{border-color:rgba(105,255,71,0.25);} .fee-card.status-late{border-color:rgba(255,82,82,0.3);} .fee-card.status-due{border-color:rgba(255,213,79,0.25);}
+    .fc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+    .fc-name{font-size:.92rem;color:#e8f0fb;font-weight:600;} .fc-id{font-size:.68rem;color:#5a7a9a;margin-top:2px;}
+    .fc-badge{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
+    .fc-badge.paid{background:rgba(105,255,71,0.12);color:#69ff47;border:1px solid rgba(105,255,71,0.35);}
+    .fc-badge.due{background:rgba(255,213,79,0.12);color:#ffd54f;border:1px solid rgba(255,213,79,0.35);}
+    .fc-badge.late{background:rgba(255,82,82,0.12);color:#ff8a80;border:1px solid rgba(255,82,82,0.35);}
+    .fc-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.72rem;color:#7a95b0;}
+    .fc-meta .hl{color:#c0c0c0;}
+    .fc-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+    .fc-amount{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#ffd54f;}
+    /* BUTTONS */
+    .btn{padding:8px 16px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.3px;cursor:pointer;border:1px solid;transition:all .18s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+    .btn:active{transform:scale(.96);}
+    .btn-primary{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,.5);color:#00e5ff;}
+    .btn-warn{background:rgba(255,213,79,0.1);border-color:rgba(255,213,79,.5);color:#ffd54f;}
+    .btn-danger{background:rgba(255,82,82,0.1);border-color:rgba(255,82,82,.4);color:#ff8a80;}
+    .btn-outline{background:transparent;border-color:rgba(30,58,95,.9);color:#7a95b0;}
+    .btn-green{background:rgba(105,255,71,0.1);border-color:rgba(105,255,71,.4);color:#69ff47;}
+    .btn-cyan{background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,.4);color:#00e5ff;}
+    .btn-sm{padding:5px 12px;font-size:.75rem;}
+    /* SEARCH */
+    .count-bar{font-size:.78rem;color:#00e5ff;font-weight:600;margin-bottom:10px;padding:7px 12px;background:rgba(0,229,255,0.05);border-radius:8px;border:1px solid rgba(0,229,255,0.1);}
+    .search-add{display:flex;gap:8px;margin-bottom:12px;}
+    .search-bar{flex:1;background:rgba(8,18,38,0.7);border:1px solid rgba(30,58,95,.8);border-radius:8px;padding:10px 13px;color:#e0eaf5;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;}
+    .search-bar::placeholder{color:#3a5a7a;}
+    .search-bar:focus{border-color:rgba(0,229,255,.5);}
+    /* STUDENT LIST */
+    .student-list{display:flex;flex-direction:column;gap:9px;}
+    .student-row{background:rgba(8,18,38,0.55);border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:12px 13px;}
+    .student-row.inactive{opacity:.45;}
+    .sr-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px;}
+    .sr-id{font-family:'Rajdhani',sans-serif;font-size:.78rem;color:#00e5ff;flex-shrink:0;}
+    .sr-name{font-size:.9rem;color:#e8f0fb;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .sr-rank{font-family:'Rajdhani',sans-serif;font-size:.75rem;color:#ffd54f;flex-shrink:0;}
+    .sr-meta{font-size:.7rem;color:#5a7a9a;margin-bottom:7px;}
+    .sr-bottom{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+    .fees-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;}
+    .fees-badge.paid{background:rgba(105,255,71,0.1);color:#69ff47;border:1px solid rgba(105,255,71,.3);}
+    .fees-badge.due{background:rgba(255,213,79,0.1);color:#ffd54f;border:1px solid rgba(255,213,79,.3);}
+    .fees-badge.late{background:rgba(255,82,82,0.1);color:#ff8a80;border:1px solid rgba(255,82,82,.3);}
+    .fees-badge.nodata{background:rgba(96,125,139,0.1);color:#7a95b0;border:1px solid rgba(96,125,139,.25);}
+    /* ATTENDANCE */
+    .att-grid{display:flex;flex-direction:column;gap:7px;max-height:440px;overflow-y:auto;}
+    .att-row{display:flex;align-items:center;gap:11px;padding:10px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+    .att-row.absent-row{border-color:rgba(255,82,82,.5);background:rgba(255,82,82,0.04);}
+    .att-info{flex:1;}
+    .att-name-text{font-size:.88rem;color:#e8f0fb;font-weight:600;}
+    .att-class-text{font-size:.68rem;color:#5a7a9a;margin-top:1px;}
+    .att-toggle{width:36px;height:36px;border-radius:8px;border:none;font-size:.95rem;cursor:pointer;background:rgba(105,255,71,0.15);color:#69ff47;-webkit-tap-highlight-color:transparent;transition:all .15s;flex-shrink:0;}
+    .att-toggle.absent{background:rgba(255,82,82,0.18);color:#ff8a80;}
+    /* FORMS */
+    .form-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:11px;}
+    .form-group{flex:1;min-width:130px;}
+    .form-group label{display:block;font-size:.68rem;color:#c0c0c0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+    .form-group input,.form-group select,.form-group textarea{width:100%;background:rgba(8,18,38,0.8);border:1px solid rgba(30,58,95,.8);border-radius:8px;padding:10px 12px;color:#e0eaf5;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;}
+    .form-group input:focus,.form-group select:focus{border-color:rgba(0,229,255,.5);}
+    .form-group select option{background:#0a192f;}
+    /* MODAL */
+    .modal-overlay,.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);z-index:300;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+    .modal-overlay.open,.confirm-overlay.open{display:flex;}
+    .modal{background:rgba(13,27,55,0.97);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,0.3);border-radius:14px;padding:22px;width:100%;max-width:500px;margin:auto;box-shadow:0 30px 60px -15px rgba(0,0,0,0.7);}
+    .modal h3{font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#00e5ff;margin-bottom:18px;letter-spacing:.5px;}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+    .confirm-box{background:rgba(13,27,55,0.97);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,0.3);border-radius:14px;padding:26px;width:100%;max-width:340px;margin:auto;text-align:center;}
+    .confirm-icon{font-size:2rem;margin-bottom:10px;}
+    .confirm-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#e8f0fb;font-weight:700;}
+    .confirm-msg{font-size:.83rem;color:#7a95b0;margin:10px 0 18px;line-height:1.55;white-space:pre-line;}
+    .confirm-btns{display:flex;gap:10px;justify-content:center;}
+    /* STATUS */
+    .status-msg{padding:10px 13px;border-radius:8px;font-size:.8rem;margin-top:11px;display:none;}
+    .status-msg.success{display:block;background:rgba(105,255,71,0.08);border:1px solid rgba(105,255,71,.3);color:#69ff47;}
+    .status-msg.error{display:block;background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,.3);color:#ff8a80;}
+    .status-msg.loading{display:block;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,.2);color:#00e5ff;}
+    .spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(0,229,255,0.2);border-top-color:#00e5ff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .empty{text-align:center;padding:22px;color:#5a7a9a;font-size:.83rem;}
+    /* MIGRATE ROW */
+    .migrate-row{display:flex;gap:10px;flex-wrap:wrap;background:rgba(255,213,79,0.04);border:1px solid rgba(255,213,79,0.18);border-radius:10px;padding:13px;margin-bottom:14px;align-items:flex-start;}
+    .migrate-row p{flex:1;font-size:.78rem;color:#7a95b0;line-height:1.55;min-width:160px;}
+    .migrate-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+    /* HIST SELECT */
+    .hist-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+    .hist-row label{font-size:.68rem;color:#7a95b0;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+    .hist-row select{flex:1;background:rgba(8,18,38,0.8);border:1px solid rgba(30,58,95,.8);border-radius:8px;padding:8px 11px;color:#c0c0c0;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;min-width:140px;}
+    .hist-row select option{background:#0a192f;}
+    /* FEES CONTROLS */
+    .fees-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+    .fees-controls .search-bar{flex:1;min-width:130px;}
+    .fees-controls select{background:rgba(8,18,38,0.8);border:1px solid rgba(30,58,95,.8);border-radius:8px;padding:9px 11px;color:#c0c0c0;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;}
+    .fees-controls select option{background:#0a192f;}
+    /* LEADERBOARD LIST */
+    .lb-list-admin{display:flex;flex-direction:column;gap:7px;}
+    .lb-row-admin{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;}
+    .lb-rank{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:#ffd54f;min-width:32px;text-align:center;flex-shrink:0;}
+    .lb-info{flex:1;min-width:0;}
+    .lb-name-text{font-size:.88rem;color:#e8f0fb;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .lb-school-text{font-size:.68rem;color:#5a7a9a;margin-top:2px;}
+    .lb-score{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:#00e5ff;flex-shrink:0;}
+    /* BATCH TAB */
+    .batch-assign-grid{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;}
+    .batch-student-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;}
+    .batch-student-row .bsr-info{flex:1;min-width:0;}
+    .bsr-name{font-size:.88rem;color:#e8f0fb;font-weight:600;}
+    .bsr-id{font-size:.68rem;color:#5a7a9a;margin-top:2px;}
+    .bsr-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+    .bsr-badge{font-size:.62rem;padding:2px 7px;border-radius:6px;background:rgba(0,229,255,0.1);color:#00e5ff;border:1px solid rgba(0,229,255,0.25);}
+    /* VIEW STATUS */
+    .file-stat-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;margin-bottom:7px;}
+    .fsr-info{flex:1;min-width:0;}
+    .fsr-name{font-size:.88rem;color:#e8f0fb;font-weight:600;}
+    .fsr-id{font-size:.68rem;color:#5a7a9a;margin-top:2px;}
+    .fsr-count{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;}
+    .fsr-count.unseen{color:#ff8a80;} .fsr-count.allseen{color:#69ff47;}
+    /* FILE REGISTER */
+    .register-file-form{background:rgba(8,18,38,0.55);border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:14px;margin-bottom:14px;}
+    @media(max-width:420px){
+      .summary-cards{grid-template-columns:1fr 1fr;}
+      .summary-cards .sum-card:last-child:nth-child(odd){grid-column:1/-1;}
+    }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div><div class="brand-name">Guided Path Noida</div><div class="brand-sub">Admin Control Panel</div></div>
+  <div class="top-right">
+    <span class="admin-tag" id="adminName">Admin</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('students',this)"><span class="t-icon">👥</span><span>Students</span></button>
+    <button class="tab-btn" onclick="showTab('attendance',this)"><span class="t-icon">📅</span><span>Attend.</span></button>
+    <button class="tab-btn" onclick="showTab('leaderboard',this)"><span class="t-icon">🏆</span><span>Leaders</span></button>
+    <button class="tab-btn" onclick="showTab('fees',this)"><span class="t-icon">💰</span><span>Fees</span></button>
+    <button class="tab-btn" onclick="showTab('batches',this)"><span class="t-icon">🗂️</span><span>Batches</span></button>
+    <button class="tab-btn" onclick="showTab('viewstatus',this)"><span class="t-icon">👁️</span><span>Files</span></button>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="section active" id="sec-students">
+    <div class="card">
+      <div class="card-title">👥 All Students</div>
+      <div class="monthly-total"><div class="mt-label">📊 Monthly Institute Income</div><div class="mt-val" id="monthlyTotal">—</div></div>
+      <div class="count-bar" id="studentCount">Loading students...</div>
+      <div class="search-add">
+        <input class="search-bar" id="studentSearch" placeholder="Search name, ID, class..." oninput="filterStudents()"/>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add</button>
+      </div>
+      <div class="student-list" id="studentList"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="section" id="sec-attendance">
+    <div class="card">
+      <div class="card-title">📅 Mark Attendance</div>
+      <div class="form-row">
+        <div class="form-group"><label>Date</label><input type="date" id="attDate" onchange="updateDay()"/></div>
+        <div class="form-group"><label>Day</label><input type="text" id="attDay" readonly/></div>
+      </div>
+      <div style="display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="btn btn-warn" onclick="markHoliday()">🏖️ Holiday</button>
+        <button class="btn btn-outline" onclick="resetAttendance()">↺ Reset</button>
+      </div>
+      <div style="font-size:.72rem;color:#5a7a9a;margin-bottom:11px;">Tap student row to toggle Absent — green = Present · red = Absent</div>
+      <div class="att-grid" id="attGrid"><div class="empty">Load students first</div></div>
+      <div class="status-msg" id="attMsg"></div>
+      <button class="btn btn-primary" id="btnSubmitAtt" style="width:100%;margin-top:14px;" onclick="submitAttendance()">✓ Submit Attendance</button>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="section" id="sec-leaderboard">
+    <div class="card">
+      <div class="card-title">🏆 Leaderboard Management</div>
+      <p style="font-size:.83rem;color:#7a95b0;margin-bottom:14px;line-height:1.6;">Update rankings after entering test marks in the Tests sheet.<br>Run every Wednesday after test results are entered.</p>
+      <button class="btn btn-primary" id="btnUpdateLB" onclick="updateLeaderboard()">🔄 Update Leaderboard Now</button>
+      <div class="status-msg" id="lbMsg"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 All Students — Rank View</div>
+      <div class="search-add" style="margin-bottom:12px;">
+        <input class="search-bar" id="lbSearch" placeholder="Search student..." oninput="filterLB()"/>
+      </div>
+      <div id="lbPreview"><div class="empty"><span class="spinner"></span> Loading rankings...</div></div>
+    </div>
+  </div>
+
+  <!-- FEES -->
+  <div class="section" id="sec-fees">
+    <div class="migrate-row">
+      <p>⚠️ First-time setup: Run Migration to load existing students. Use Sync All to rebuild cycles after bulk edits.</p>
+      <div class="migrate-actions">
+        <button class="btn btn-warn btn-sm" id="btnMigrate" onclick="runMigration()">▶ Migrate</button>
+        <button class="btn btn-cyan btn-sm" id="btnSyncAll" onclick="runSyncAll()">↺ Sync All</button>
+      </div>
+      <div class="status-msg" id="migrateMsg" style="margin-top:8px;width:100%;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Session Summary (Mar 2026 → May 2027)</div>
+      <div class="summary-cards">
+        <div class="sum-card green"><div class="sc-label">Collected</div><div class="sc-val" id="sessionCollected">—</div><div class="sc-sub">Since Mar 2026</div></div>
+        <div class="sum-card red"><div class="sc-label">Due</div><div class="sc-val" id="sessionDue">—</div><div class="sc-sub">All students</div></div>
+        <div class="sum-card yellow"><div class="sc-label">Expected</div><div class="sc-val" id="sessionExpected">—</div><div class="sc-sub">Session total</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Billing Cycle View</div>
+      <div class="hist-row">
+        <label>View Month</label>
+        <select id="histMonth" onchange="onHistChange()">
+          <option value="">Current Cycle</option>
+          <option>Mar 2026</option><option>Apr 2026</option><option>May 2026</option>
+          <option>Jun 2026</option><option>Jul 2026</option><option>Aug 2026</option>
+          <option>Sep 2026</option><option>Oct 2026</option><option>Nov 2026</option>
+          <option>Dec 2026</option><option>Jan 2027</option><option>Feb 2027</option>
+          <option>Mar 2027</option><option>Apr 2027</option><option>May 2027</option>
+        </select>
+      </div>
+      <div class="summary-cards" style="margin-bottom:14px;">
+        <div class="sum-card green"><div class="sc-label">Collected</div><div class="sc-val" id="monthCollected">—</div><div class="sc-sub" id="monthLabel">This cycle</div></div>
+        <div class="sum-card red"><div class="sc-label">Due</div><div class="sc-val" id="monthDue">—</div><div class="sc-sub">Pending</div></div>
+        <div class="sum-card yellow"><div class="sc-label">Expected</div><div class="sc-val" id="monthExpected">—</div><div class="sc-sub">Active students</div></div>
+      </div>
+      <div class="fees-controls">
+        <input class="search-bar" id="feesSearch" placeholder="Search student..." oninput="filterFees()"/>
+        <select id="feesFilter" onchange="filterFees()">
+          <option value="">All Status</option>
+          <option>Due</option><option>Late</option><option>Paid</option>
+        </select>
+      </div>
+      <div class="fee-cards-wrap" id="feesTableBody"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+      <div class="status-msg" id="feesMsg"></div>
+    </div>
+  </div>
+
+  <!-- BATCHES -->
+  <div class="section" id="sec-batches">
+    <div class="card">
+      <div class="card-title">🗂️ Batch Assignment</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Select Batch</label>
+          <select id="batchSelect" onchange="onBatchChange()">
+            <option value="">— Choose Batch —</option>
+            <option value="GPN - Batch 1">GPN - Batch 1</option>
+            <option value="GPN - Batch 2">GPN - Batch 2</option>
+            <option value="GPN - Batch 3">GPN - Batch 3</option>
+            <option value="GPN - Batch 4">GPN - Batch 4</option>
+            <option value="GPN - Batch 5">GPN - Batch 5</option>
+            <option value="GPN - Batch 6">GPN - Batch 6</option>
+            <option value="GPN - Batch 7">GPN - Batch 7</option>
+            <option value="GPN - Batch 8">GPN - Batch 8</option>
+            <option value="GPN - Batch 9">GPN - Batch 9</option>
+            <option value="GPN - Batch 10">GPN - Batch 10</option>
+          </select>
+        </div>
+      </div>
+      <div id="batchTimingForm" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>Start Time (e.g. 3:00 PM)</label><input type="text" id="batchStart" placeholder="e.g. 3:00 PM"/></div>
+          <div class="form-group"><label>End Time (e.g. 4:00 PM)</label><input type="text" id="batchEnd" placeholder="e.g. 4:00 PM"/></div>
+        </div>
+        <div class="form-group" style="margin-bottom:11px;">
+          <label>Class Days</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;" id="dayCheckboxes">
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Mon"> Mon</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Tue"> Tue</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Wed"> Wed</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Thu"> Thu</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Fri"> Fri</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Sat"> Sat</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;"><input type="checkbox" value="Sun"> Sun</label>
+          </div>
+        </div>
+        <div class="search-add" style="margin-bottom:12px;">
+          <input class="search-bar" id="batchStudentSearch" placeholder="Search student..." oninput="filterBatchStudents()"/>
+        </div>
+        <div class="status-msg" id="batchMsg"></div>
+        <div class="batch-assign-grid" id="batchStudentList"><div class="empty">Select a batch to assign students</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Current Batch Assignments</div>
+      <div class="search-add" style="margin-bottom:12px;">
+        <input class="search-bar" id="assignmentSearch" placeholder="Search student..." oninput="filterAssignments()"/>
+      </div>
+      <div id="assignmentList"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- VIEW STATUS -->
+  <div class="section" id="sec-viewstatus">
+    <div class="card">
+      <div class="card-title">📁 Register File</div>
+      <div class="register-file-form">
+        <div class="form-row">
+          <div class="form-group"><label>File Name</label><input type="text" id="reg_fname" placeholder="e.g. Chapter 1 Notes"/></div>
+          <div class="form-group">
+            <label>Class</label>
+            <select id="reg_class">
+              <option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option>
+              <option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option selected>Class 10</option>
+              <option>Class 11 NEET</option><option>Class 12 NEET</option><option>Class 11 JEE</option><option>Class 12 JEE</option>
+              <option>Class 11 Hindi</option><option>Class 12 Hindi</option><option>Nursery</option><option>LKG</option><option>UKG</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:11px;"><label>Google Drive URL</label><input type="text" id="reg_url" placeholder="https://drive.google.com/..."/></div>
+        <button class="btn btn-primary" id="btnRegFile" onclick="registerFile()">📎 Register File</button>
+        <div class="status-msg" id="regFileMsg"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Registered Files</div>
+      <div id="allFilesList"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👁️ Student File View Status</div>
+      <div class="search-add" style="margin-bottom:12px;">
+        <input class="search-bar" id="vsSearch" placeholder="Search student..." oninput="filterViewStatus()"/>
+      </div>
+      <div id="viewStatusList"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🔐 Student Login Count</div>
+      <div class="search-add" style="margin-bottom:12px;">
+        <input class="search-bar" id="lcSearch" placeholder="Search student..." oninput="filterLoginCounts()"/>
+      </div>
+      <div id="loginCountList"><div class="empty"><span class="spinner"></span> Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL — uses flex-start so it appears at top on mobile -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3>➕ Add New Student</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Student ID</label><input id="ns_id" placeholder="e.g. GPN081"/></div>
+      <div class="form-group"><label>Password</label><input id="ns_pw" placeholder="gpn081@2026"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2;min-width:170px;"><label>Full Name</label><input id="ns_name" placeholder="Student Name"/></div>
+      <div class="form-group"><label>Sex</label><select id="ns_sex"><option value="M">Male</option><option value="F">Female</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Father's Name</label><input id="ns_fn" placeholder="Father Name"/></div>
+      <div class="form-group"><label>Phone</label><input id="ns_ph" placeholder="9999999999" type="tel"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Class</label><input id="ns_cls" placeholder="Class 10"/></div>
+      <div class="form-group"><label>School</label><input id="ns_sch" placeholder="School Name"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Date of Joining</label><input id="ns_doj" type="date"/></div>
+      <div class="form-group"><label>Fees Amount (₹)</label><input id="ns_fees" placeholder="2000" type="number"/></div>
+    </div>
+    <div class="status-msg" id="addMsg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="btnCancelAdd" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" id="btnConfirmAdd" onclick="addStudent()">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="confirmResolve(false)">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="confirmResolve(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbzO3sf2bgSstGAlpnGAEIGPkcTR7ulIWJDVxavY-uK-QUA7U12c7My4CYV3Yvn5kF4S/exec";
+const DAYS_OF_WEEK=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+const adminRaw=sessionStorage.getItem('gpn_admin');
+const token=sessionStorage.getItem('gpn_token')||'';
+if(!adminRaw)window.location.assign('index.html');
+const adminData=JSON.parse(adminRaw||'{}');
+document.getElementById('adminName').textContent=adminData.name||'Admin';
+
+let allStudents=[],allFeesData=[],allLbData=[],allBatchAssignments=[],allFiles=[],allFileViews=[];
+let absentSet=new Set(),isHoliday=false;
+
+// ── UTILS ──
+function setBtns(ids,dis){ids.forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=dis;});}
+function fmtRupee(n){return '₹'+Number(n||0).toLocaleString('en-IN');}
+function fmtDate(v){
+  if(!v)return '—'; var s=String(v).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){var p=s.split('-');return parseInt(p[2])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(p[1])-1]+' '+p[0];}
+  if(/^\d{1,2} [A-Za-z]{3} \d{4}/.test(s))return s;
+  var n=parseFloat(s);if(!isNaN(n)&&n>40000){var d=new Date(Math.round((n-25569)*86400*1000));return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();}
+  return s;
+}
+
+// ── CONFIRM DIALOG ──
+let confirmResolve=function(){};
+function gpnConfirm(icon,title,msg,okLabel,okClass){
+  document.getElementById('confirmIcon').textContent=icon;
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  var ob=document.getElementById('confirmOkBtn');ob.textContent=okLabel||'Confirm';ob.className='btn '+(okClass||'btn-danger');
+  document.getElementById('confirmOverlay').classList.add('open');
+  return new Promise(function(res){confirmResolve=function(val){document.getElementById('confirmOverlay').classList.remove('open');res(val);};});
+}
+
+// ── TABS ──
+function showTab(tab,btn){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('sec-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='attendance')renderAttGrid();
+  if(tab==='fees')loadFeesSummary();
+  if(tab==='leaderboard')loadLeaderboardAll();
+  if(tab==='batches'){loadBatchAssignments();}
+  if(tab==='viewstatus'){loadViewStatus();}
+  setTimeout(sendHeight,200);
+}
+
+// ── DATE ──
+function updateDay(){var v=document.getElementById('attDate').value;if(v)document.getElementById('attDay').value=DAYS_OF_WEEK[new Date(v+'T00:00:00').getDay()];}
+document.getElementById('attDate').value=new Date().toISOString().split('T')[0];updateDay();
+
+// ── LOAD STUDENTS (single call) ──
+async function loadStudents(){
+  document.getElementById('studentList').innerHTML='<div class="empty"><span class="spinner"></span> Loading...</div>';
+  try{
+    var res=await fetch(API_URL+'?action=getAdminStudents&token='+encodeURIComponent(token));
+    var j=await res.json();
+    if(j.status==='success'){
+      allStudents=j.students||[];
+      document.getElementById('monthlyTotal').textContent=fmtRupee(j.monthlyTotal||0)+'/month';
+      renderStudents(allStudents);
+      renderAttGrid();
+    }else{
+      document.getElementById('studentList').innerHTML='<div class="empty">Failed: '+(j.message||'error')+'</div>';
+    }
+  }catch(e){document.getElementById('studentList').innerHTML='<div class="empty">Connection error. Try refreshing.</div>';}
+}
+
+function renderStudents(list){
+  var el=document.getElementById('studentList');
+  var active=list.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';}).length;
+  document.getElementById('studentCount').textContent=active+' Active · '+(list.length-active)+' Inactive · '+list.length+' Total';
+  if(!list.length){el.innerHTML='<div class="empty">No students found.</div>';return;}
+  el.innerHTML=list.map(function(s){
+    var isInactive=String(s.status||'').toLowerCase()==='inactive';
+    var fs=String(s.feesStatus||'No Data').toLowerCase();
+    var paid=fs==='paid',late=fs==='late',nodata=fs==='no data'||fs==='not started';
+    var fcls=paid?'paid':late?'late':nodata?'nodata':'due';
+    var flbl=paid?'✓ Paid':late?'⚠ Late'+(s.daysLate>0?' +'+s.daysLate+'d':''):nodata?'—':'⏳ Due';
+    var sid=String(s.id||'').replace(/'/g,"\\'");
+    var nm=String(s.name||'').replace(/'/g,"\\'");
+    var cl=String(s.feesLabel||'').replace(/'/g,"\\'");
+    return '<div class="student-row '+(isInactive?'inactive':'')+'">'+
+      '<div class="sr-top"><span class="sr-id">'+esc(s.id)+'</span><span class="sr-name">'+esc(s.name)+'</span>'+(s.rank?'<span class="sr-rank">#'+esc(String(s.rank))+'</span>':'')+'</div>'+
+      '<div class="sr-meta">'+esc(s.cls)+' · Joined: '+fmtDate(s.doj)+'</div>'+
+      '<div class="sr-bottom">'+
+        '<span class="fees-badge '+fcls+'">'+flbl+'</span>'+
+        (!isInactive&&!paid&&!nodata?'<button class="btn btn-primary btn-sm" onclick="doMarkPaid(\''+sid+'\',\''+nm+'\',\''+cl+'\')">Mark Paid</button>':'')+
+        (!isInactive?'<button class="btn btn-danger btn-sm" onclick="doRemove(\''+sid+'\',\''+nm+'\')">Remove</button>':'')+
+      '</div></div>';
+  }).join('');
+  sendHeight();
+}
+
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'—';}
+function fmtScore(raw){
+  if(!raw&&raw!==0)return'0%';
+  var s=String(raw);
+  var n=parseFloat(s);
+  if(isNaN(n))return s;
+  if(n<2&&n>0)n=Math.round(n*1000)/10;
+  else n=Math.round(n*10)/10;
+  return n+'%';
+}
+
+function filterStudents(){
+  var q=document.getElementById('studentSearch').value.toLowerCase();
+  renderStudents(q?allStudents.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.id||'').toLowerCase().includes(q)||(s.cls||'').toLowerCase().includes(q);}):allStudents);
+}
+
+// ── REMOVE STUDENT ──
+async function doRemove(sid,name){
+  var ok=await gpnConfirm('🗑️','Remove Student?',name+' ('+sid+') will be marked Inactive.\nAll data preserved. Future fee cycles marked Inactive.','Yes, Remove','btn-danger');
+  if(!ok)return;
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'removeStudent',studentId:sid,token:token})});
+    var j=await res.json();
+    if(j.status==='success')loadStudents();
+    else await gpnConfirm('❌','Error',j.message,'OK','btn-outline');
+  }catch(e){await gpnConfirm('❌','Error','Connection error','OK','btn-outline');}
+}
+
+// ── MARK PAID ──
+async function doMarkPaid(sid,name,cycleLabel){
+  var ok=await gpnConfirm('💰','Mark Fees Paid?','Confirm fees received from:\n'+name+' ('+sid+')\n'+(cycleLabel?'📅 '+cycleLabel:'Current cycle')+'\n\nToday\'s date will be recorded.','Yes, Mark Paid','btn-primary');
+  if(!ok)return;
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markFeesPaid',studentId:sid,cycleLabel:cycleLabel||null,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('feesMsg','✓ '+name+' — '+j.newStatus+'. ₹'+j.paidAmount+' on '+j.paymentDate,'success');loadStudents();loadFeesSummary();}
+    else await gpnConfirm('❌','Error',j.message,'OK','btn-outline');
+  }catch(e){await gpnConfirm('❌','Error','Connection error','OK','btn-outline');}
+}
+
+async function doMarkPaidFromTable(sid,name,cycleLabel){await doMarkPaid(sid,name,cycleLabel);}
+
+// ── ADD STUDENT MODAL ──
+function openAddModal(){
+  ['ns_id','ns_pw','ns_name','ns_fn','ns_ph','ns_cls','ns_sch'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('ns_sex').value='M';
+  document.getElementById('ns_doj').value='';
+  document.getElementById('ns_fees').value='';
+  showMsg('addMsg','','');
+  document.getElementById('addModal').classList.add('open');
+  // Scroll modal to top of viewport (mobile fix)
+  setTimeout(function(){window.scrollTo(0,0);},50);
+}
+function closeAddModal(){document.getElementById('addModal').classList.remove('open');}
+
+async function addStudent(){
+  var s={
+    id:document.getElementById('ns_id').value.trim(),
+    password:document.getElementById('ns_pw').value.trim(),
+    name:document.getElementById('ns_name').value.trim(),
+    sex:document.getElementById('ns_sex').value,
+    fatherName:document.getElementById('ns_fn').value.trim(),
+    phone:document.getElementById('ns_ph').value.trim(),
+    cls:document.getElementById('ns_cls').value.trim(),
+    school:document.getElementById('ns_sch').value.trim(),
+    doj:document.getElementById('ns_doj').value,
+    feesAmount:document.getElementById('ns_fees').value.trim()
+  };
+  if(!s.id||!s.name){showMsg('addMsg','ID and Name are required.','error');return;}
+  setBtns(['btnConfirmAdd','btnCancelAdd'],true);
+  showMsg('addMsg','Adding student...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'addStudent',student:s,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('addMsg','✓ Student added! Fee cycles auto-created.','success');setTimeout(function(){closeAddModal();loadStudents();},1400);}
+    else showMsg('addMsg',j.message,'error');
+  }catch(e){showMsg('addMsg','Connection error','error');}
+  finally{setBtns(['btnConfirmAdd','btnCancelAdd'],false);}
+}
+
+// ── ATTENDANCE ──
+function renderAttGrid(){
+  var active=allStudents.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';});
+  var grid=document.getElementById('attGrid');
+  if(!active.length){grid.innerHTML='<div class="empty">No active students. Load students first.</div>';return;}
+  grid.innerHTML=active.map(function(s){
+    var sid=String(s.id||'');
+    var isAbs=absentSet.has(sid);
+    return '<div class="att-row '+(isAbs?'absent-row':'')+'" id="arow_'+sid+'" onclick="toggleAbsent(\''+sid+'\')">'+
+      '<div class="att-info"><div class="att-name-text">'+esc(s.name)+'</div><div class="att-class-text">'+esc(s.cls)+'</div></div>'+
+      '<button class="att-toggle '+(isAbs?'absent':'')+'" id="atb_'+sid+'">'+(isAbs?'✗':'✓')+'</button>'+
+    '</div>';
+  }).join('');
+}
+function toggleAbsent(sid){
+  absentSet.has(sid)?absentSet.delete(sid):absentSet.add(sid);
+  var btn=document.getElementById('atb_'+sid),row=document.getElementById('arow_'+sid),isAbs=absentSet.has(sid);
+  if(btn){btn.classList.toggle('absent',isAbs);btn.textContent=isAbs?'✗':'✓';}
+  if(row)row.classList.toggle('absent-row',isAbs);
+}
+function resetAttendance(){absentSet.clear();isHoliday=false;renderAttGrid();showMsg('attMsg','Attendance reset — all marked Present.','success');}
+function markHoliday(){isHoliday=true;absentSet.clear();showMsg('attMsg','📅 This day will be saved as Holiday for all students.','success');}
+async function submitAttendance(){
+  var dateVal=document.getElementById('attDate').value,dayVal=document.getElementById('attDay').value;
+  if(!dateVal){showMsg('attMsg','Please select a date.','error');return;}
+  setBtns(['btnSubmitAtt'],true);showMsg('attMsg','Saving attendance...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markAttendance',date:dateVal,day:dayVal,holiday:isHoliday,absents:Array.from(absentSet),token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('attMsg','✓ Saved for '+fmtDate(dateVal)+'. Absent: '+absentSet.size+'.','success');isHoliday=false;absentSet.clear();renderAttGrid();}
+    else showMsg('attMsg',j.message,'error');
+  }catch(e){showMsg('attMsg','Connection error','error');}
+  finally{setBtns(['btnSubmitAtt'],false);}
+}
+
+// ── LEADERBOARD ──
+async function updateLeaderboard(){
+  setBtns(['btnUpdateLB'],true);showMsg('lbMsg','Updating leaderboard...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateLeaderboard',token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('lbMsg','✓ Leaderboard updated. '+j.count+' students ranked.','success');allLbData=j.leaderboard||[];renderLBAll(allLbData);}
+    else showMsg('lbMsg',j.message,'error');
+  }catch(e){showMsg('lbMsg','Connection error','error');}
+  finally{setBtns(['btnUpdateLB'],false);}
+}
+
+async function loadLeaderboardAll(){
+  document.getElementById('lbPreview').innerHTML='<div class="empty"><span class="spinner"></span> Loading...</div>';
+  try{
+    var res=await fetch(API_URL+'?action=leaderboard');
+    var j=await res.json();
+    if(j.status==='success'&&j.leaderboard){allLbData=j.leaderboard;renderLBAll(j.leaderboard);}
+    else document.getElementById('lbPreview').innerHTML='<div class="empty">No data yet. Click Update Leaderboard.</div>';
+  }catch(e){document.getElementById('lbPreview').innerHTML='<div class="empty">Connection error.</div>';}
+}
+
+function renderLBAll(list){
+  var el=document.getElementById('lbPreview');
+  if(!list||!list.length){el.innerHTML='<div class="empty">No leaderboard data yet.</div>';sendHeight();return;}
+  el.innerHTML='<div class="lb-list-admin">'+list.map(function(s){
+    return '<div class="lb-row-admin">'+
+      '<div class="lb-rank">#'+esc(String(s.rank))+'</div>'+
+      '<div class="lb-info"><div class="lb-name-text">'+esc(s.name)+'</div><div class="lb-school-text">'+esc(s.cls)+(s.school?' · '+esc(s.school):'')+'</div></div>'+
+      '<div class="lb-score">'+fmtScore(s.overallAvg||0)+'</div>'+
+    '</div>';
+  }).join('')+'</div>';
+  sendHeight();
+}
+
+function filterLB(){
+  var q=document.getElementById('lbSearch').value.toLowerCase();
+  renderLBAll(q?allLbData.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.sid||'').toLowerCase().includes(q);}):allLbData);
+}
+
+// ── FEES ──
+async function loadFeesSummary(){
+  var histVal=document.getElementById('histMonth').value;
+  if(histVal){await loadHistoricalMonth(histVal);return;}
+  showMsg('feesMsg','Loading...','loading');setBtns(['btnMigrate','btnSyncAll'],true);
+  try{
+    var res=await fetch(API_URL+'?action=getFeesSummary&token='+encodeURIComponent(token));
+    var j=await res.json();
+    if(j.status!=='success'){showMsg('feesMsg',j.message||'Failed.','error');return;}
+    var s=j.session||{};
+    document.getElementById('sessionCollected').textContent=fmtRupee(s.collected);
+    document.getElementById('sessionDue').textContent=fmtRupee(s.due);
+    document.getElementById('sessionExpected').textContent=fmtRupee(s.expected);
+    var m=j.thisMonth||{};
+    document.getElementById('monthCollected').textContent=fmtRupee(m.collected);
+    document.getElementById('monthDue').textContent=fmtRupee(m.due);
+    document.getElementById('monthExpected').textContent=fmtRupee(m.expected);
+    document.getElementById('monthLabel').textContent='Current cycle';
+    allFeesData=m.students||[];renderFeeCards(allFeesData);
+    showMsg('feesMsg','','');
+  }catch(e){showMsg('feesMsg','Connection error.','error');}
+  finally{setBtns(['btnMigrate','btnSyncAll'],false);}
+}
+
+async function loadHistoricalMonth(monthYear){
+  showMsg('feesMsg','Loading '+monthYear+'...','loading');
+  var parts=monthYear.split(' ');
+  try{
+    var res=await fetch(API_URL+'?action=getFeesData&month='+encodeURIComponent(parts[0])+'&year='+encodeURIComponent(parts[1])+'&token='+encodeURIComponent(token));
+    var j=await res.json();
+    if(j.status!=='success'){showMsg('feesMsg',j.message||'Failed.','error');return;}
+    var sum=j.summary||{};
+    document.getElementById('monthCollected').textContent=fmtRupee(sum.collected);
+    document.getElementById('monthDue').textContent=fmtRupee(sum.due);
+    document.getElementById('monthExpected').textContent=fmtRupee(sum.expected);
+    document.getElementById('monthLabel').textContent=monthYear;
+    allFeesData=j.rows||[];renderFeeCards(allFeesData);
+  }catch(e){showMsg('feesMsg','Connection error.','error');}
+}
+
+function onHistChange(){loadFeesSummary();}
+
+function renderFeeCards(list){
+  var wrap=document.getElementById('feesTableBody');
+  if(!list||!list.length){wrap.innerHTML='<div class="empty">No billing cycles found.</div>';sendHeight();return;}
+  wrap.innerHTML=list.map(function(s){
+    var st=s.status||'Due',stl=st.toLowerCase();
+    var fcls=stl==='paid'?'paid':stl==='late'?'late':'due';
+    var sid=String(s.studentId||'').replace(/'/g,"\\'");
+    var nm=String(s.name||'').replace(/'/g,"\\'");
+    var cl=String(s.cycleLabel||'').replace(/'/g,"\\'");
+    var canPay=st!=='Paid'&&st!=='Not Started';
+    var lateTxt=s.daysLate>0?(' · Late by '+s.daysLate+' day'+(s.daysLate>1?'s':'')):'';
+    return '<div class="fee-card status-'+fcls+'">'+
+      '<div class="fc-top"><div><div class="fc-name">'+esc(s.name)+'</div><div class="fc-id">'+esc(s.studentId)+'</div></div>'+
+      '<span class="fc-badge '+fcls+'">'+st+lateTxt+'</span></div>'+
+      '<div class="fc-meta"><span>📅 <span class="hl">'+esc(s.cycleStart)+'</span></span><span>⏰ <span class="hl">Due: '+esc(s.deadline)+'</span></span></div>'+
+      (s.paymentDate?'<div style="font-size:.68rem;color:#5a7a9a;">Paid on: '+esc(s.paymentDate)+'</div>':'')+
+      '<div class="fc-bottom"><div class="fc-amount">₹'+(s.feeAmount||0)+'</div>'+
+      (canPay?'<button class="btn btn-green btn-sm" onclick="doMarkPaidFromTable(\''+sid+'\',\''+nm+'\',\''+cl+'\')">Mark Paid</button>':'<span style="font-size:.72rem;color:#5a7a9a;">—</span>')+
+      '</div></div>';
+  }).join('');
+  sendHeight();
+}
+
+function filterFees(){
+  var q=document.getElementById('feesSearch').value.toLowerCase();
+  var st=document.getElementById('feesFilter').value;
+  var list=allFeesData;
+  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.studentId||'').toLowerCase().includes(q);});
+  if(st)list=list.filter(function(s){return s.status===st;});
+  renderFeeCards(list);
+}
+
+async function runMigration(){
+  setBtns(['btnMigrate','btnSyncAll'],true);showMsg('migrateMsg','Running migration — may take 20-30 seconds...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'migrate',token:token})});
+    var j=await res.json();
+    if(j.status==='success')showMsg('migrateMsg','✓ Done! Added: '+j.added+' records. Skipped: '+j.skipped+'.','success');
+    else showMsg('migrateMsg',j.message,'error');
+    setTimeout(loadFeesSummary,1000);
+  }catch(e){showMsg('migrateMsg','Connection error','error');}
+  finally{setBtns(['btnMigrate','btnSyncAll'],false);}
+}
+
+async function runSyncAll(){
+  var ok=await gpnConfirm('⚠️','Sync All Students?','This rebuilds all fee cycles for every student.\nPaid cycles are preserved.\nMay take 30-60 seconds.','Yes, Sync All','btn-cyan');
+  if(!ok)return;
+  setBtns(['btnMigrate','btnSyncAll'],true);showMsg('migrateMsg','Syncing all students — please wait...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'syncAll',token:token})});
+    var j=await res.json();
+    if(j.status==='success')showMsg('migrateMsg','✓ Sync complete! '+j.count+' students processed.','success');
+    else showMsg('migrateMsg',j.message,'error');
+    setTimeout(loadFeesSummary,1000);
+  }catch(e){showMsg('migrateMsg','Connection error','error');}
+  finally{setBtns(['btnMigrate','btnSyncAll'],false);}
+}
+
+// ── BATCHES ──
+// allBatchAssignments = array of {studentId, batchId, name(batch), startTime, endTime, days}
+// allBatchConfigs = array of {batchId, name, startTime, endTime, days}
+var allBatchConfigs=[];
+
+function cleanTime(t){
+  // Strip out any Date object garbage — only keep plain time strings like "3:00 PM"
+  if(!t)return'';
+  var s=String(t).trim();
+  // If it looks like a full date string (contains year or GMT), discard it
+  if(s.match(/\d{4}|GMT|UTC|IST/))return'';
+  return s;
+}
+
+function onBatchChange(){
+  var batchId=document.getElementById('batchSelect').value;
+  document.getElementById('batchTimingForm').style.display=batchId?'block':'none';
+  if(batchId){
+    // Pre-fill timing fields from existing config
+    var cfg=allBatchConfigs.find(function(b){return b.batchId===batchId;});
+    if(cfg){
+      document.getElementById('batchStart').value=cleanTime(cfg.startTime)||'';
+      document.getElementById('batchEnd').value=cleanTime(cfg.endTime)||'';
+      // Pre-tick day checkboxes
+      var savedDays=(cfg.days||'').split(',').map(function(d){return d.trim();});
+      document.querySelectorAll('#dayCheckboxes input[type=checkbox]').forEach(function(cb){
+        cb.checked=savedDays.indexOf(cb.value)>-1;
+      });
+    } else {
+      document.getElementById('batchStart').value='';
+      document.getElementById('batchEnd').value='';
+      document.querySelectorAll('#dayCheckboxes input[type=checkbox]').forEach(function(cb){cb.checked=false;});
+    }
+    renderBatchStudents();
+  }
+}
+
+var filteredBatchStudents=[];
+function renderBatchStudents(){
+  var list=allStudents.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';});
+  filteredBatchStudents=list;
+  renderBatchStudentList(list);
+}
+
+function filterBatchStudents(){
+  var q=document.getElementById('batchStudentSearch').value.toLowerCase();
+  renderBatchStudentList(q?filteredBatchStudents.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.id||'').toLowerCase().includes(q);}):filteredBatchStudents);
+}
+
+function renderBatchStudentList(list){
+  var el=document.getElementById('batchStudentList');
+  if(!list.length){el.innerHTML='<div class="empty">No students found.</div>';return;}
+  var batchId=document.getElementById('batchSelect').value;
+  // Build inBatch map from allBatchAssignments (studentId → true if in this batch)
+  var inBatch={};
+  allBatchAssignments.forEach(function(a){
+    if(String(a.batchId).trim()===String(batchId).trim()) inBatch[String(a.studentId).trim()]=true;
+  });
+  el.innerHTML=list.map(function(s){
+    var sid=String(s.id||'').replace(/'/g,"\\'");
+    var nm=String(s.name||'').replace(/'/g,"\\'");
+    var alreadyIn=inBatch[String(s.id).trim()];
+    return '<div class="batch-student-row">'+
+      '<div class="bsr-info"><div class="bsr-name">'+esc(s.name)+'</div><div class="bsr-id">'+esc(s.id)+' · '+esc(s.cls)+'</div></div>'+
+      (alreadyIn?
+        '<button class="btn btn-danger btn-sm" onclick="removeBatchAssignment(\''+sid+'\',\''+nm+'\')">✕ Remove</button>':
+        '<button class="btn btn-primary btn-sm" onclick="assignToBatch(\''+sid+'\',\''+nm+'\')">+ Add</button>'
+      )+
+    '</div>';
+  }).join('');
+}
+
+async function assignToBatch(sid,name){
+  var batchId=document.getElementById('batchSelect').value;
+  if(!batchId){showMsg('batchMsg','Select a batch first.','error');return;}
+  var start=document.getElementById('batchStart').value.trim();
+  var end=document.getElementById('batchEnd').value.trim();
+  var days=Array.from(document.querySelectorAll('#dayCheckboxes input:checked')).map(function(cb){return cb.value;}).join(', ');
+  showMsg('batchMsg','Assigning...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'assignBatch',studentId:sid,batchId:batchId,batchName:batchId,startTime:start,endTime:end,days:days,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('batchMsg','✓ '+name+' added to '+batchId+'.','success');await loadBatchAssignments();}
+    else showMsg('batchMsg',j.message,'error');
+  }catch(e){showMsg('batchMsg','Connection error','error');}
+}
+
+async function removeBatchAssignment(sid,name){
+  var batchId=document.getElementById('batchSelect').value;
+  var ok=await gpnConfirm('🗑️','Remove from Batch?','Remove '+name+' from '+batchId+'?\nThey can be assigned to a different batch after.','Yes, Remove','btn-danger');
+  if(!ok)return;
+  showMsg('batchMsg','Removing...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'removeBatchAssignment',studentId:sid,batchId:batchId,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('batchMsg','✓ Removed from '+batchId+'.','success');await loadBatchAssignments();}
+    else showMsg('batchMsg',j.message,'error');
+  }catch(e){showMsg('batchMsg','Connection error','error');}
+}
+
+async function loadBatchAssignments(){
+  try{
+    // getBatches returns batch configs with timing
+    var res=await fetch(API_URL+'?action=getBatches');
+    var bj=await res.json();
+    allBatchConfigs=bj.batches||[];
+
+    // Build allBatchAssignments: for each student, fetch their batches
+    // We build this from the student list by calling getStudentBatches per student
+    // BUT that's too many calls. Instead we build a flat assignment list from allStudents
+    // by fetching each student's batches in parallel (max 10 at a time)
+    var activeStudents=allStudents.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';});
+
+    // Fetch all student batches in one go using Promise.all in chunks
+    var chunkSize=10;
+    var allAssignments=[];
+    for(var i=0;i<activeStudents.length;i+=chunkSize){
+      var chunk=activeStudents.slice(i,i+chunkSize);
+      var results=await Promise.all(chunk.map(function(s){
+        return fetch(API_URL+'?action=getStudentBatches&studentId='+encodeURIComponent(s.id)+'&token='+encodeURIComponent(token))
+          .then(function(r){return r.json();})
+          .then(function(j){
+            if(j.status==='success'&&j.batches&&j.batches.length){
+              return j.batches.map(function(b){return{studentId:s.id,studentName:s.name,cls:s.cls,batchId:b.batchId,batchName:b.name,startTime:cleanTime(b.startTime),endTime:cleanTime(b.endTime),days:b.days};});
+            }
+            return[];
+          }).catch(function(){return[];});
+      }));
+      results.forEach(function(r){allAssignments=allAssignments.concat(r);});
+    }
+
+    allBatchAssignments=allAssignments;
+    renderAssignments();
+
+    // Re-render student list for current batch if one is selected
+    var sel=document.getElementById('batchSelect').value;
+    if(sel)renderBatchStudents();
+  }catch(e){
+    document.getElementById('assignmentList').innerHTML='<div class="empty">Could not load batch data.</div>';
+  }
+}
+
+function renderAssignments(){
+  var el=document.getElementById('assignmentList');
+  var q=document.getElementById('assignmentSearch').value.toLowerCase();
+
+  if(!allBatchAssignments.length){
+    el.innerHTML='<div class="empty">No batch assignments yet. Assign students using the form above.</div>';
+    sendHeight();return;
+  }
+
+  // Group by batchId
+  var groups={};
+  allBatchAssignments.forEach(function(a){
+    if(!groups[a.batchId])groups[a.batchId]={batchName:a.batchName||a.batchId,startTime:a.startTime,endTime:a.endTime,days:a.days,students:[]};
+    groups[a.batchId].students.push(a);
+  });
+
+  // Also add batch config timing if not in assignments
+  allBatchConfigs.forEach(function(cfg){
+    if(groups[cfg.batchId]){
+      if(!groups[cfg.batchId].startTime)groups[cfg.batchId].startTime=cleanTime(cfg.startTime);
+      if(!groups[cfg.batchId].endTime)groups[cfg.batchId].endTime=cleanTime(cfg.endTime);
+      if(!groups[cfg.batchId].days)groups[cfg.batchId].days=cfg.days;
+    }
+  });
+
+  var html='';
+  var batchIds=Object.keys(groups).sort();
+  batchIds.forEach(function(bid){
+    var g=groups[bid];
+    var students=g.students;
+    if(q){students=students.filter(function(a){return(a.studentName||'').toLowerCase().includes(q)||(a.studentId||'').toLowerCase().includes(q);});}
+    if(!students.length&&q)return;
+    var st=cleanTime(g.startTime),en=cleanTime(g.endTime);
+    var timing=(st&&en)?st+' – '+en:'';
+    var days=g.days||'';
+    html+='<div style="margin-bottom:16px;">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'+
+        '<div style="font-family:Rajdhani,sans-serif;font-size:.85rem;color:#ffd54f;font-weight:700;text-transform:uppercase;letter-spacing:1px;">'+esc(g.batchName)+'</div>'+
+        '<div style="font-size:.68rem;color:#5a7a9a;">'+students.length+' student'+(students.length!==1?'s':'')+'</div>'+
+      '</div>'+
+      (days||timing?'<div style="font-size:.72rem;color:#7a95b0;margin-bottom:8px;padding:5px 10px;background:rgba(0,229,255,0.04);border-radius:6px;border:1px solid rgba(0,229,255,0.1);">'+
+        (days?'📅 '+esc(days):'')+(days&&timing?' &nbsp;·&nbsp; ':'')+(timing?'⏰ '+esc(timing):'')+
+      '</div>':'')+
+      '<div style="display:flex;flex-direction:column;gap:6px;">';
+    students.forEach(function(a){
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:8px;">'+
+        '<div style="flex:1;min-width:0;">'+
+          '<div style="font-size:.85rem;color:#e8f0fb;font-weight:600;">'+esc(a.studentName)+'</div>'+
+          '<div style="font-size:.68rem;color:#5a7a9a;margin-top:2px;">'+esc(a.studentId)+' · '+esc(a.cls)+'</div>'+
+        '</div>'+
+      '</div>';
+    });
+    html+='</div></div><div style="height:1px;background:rgba(30,58,95,.5);margin-bottom:16px;"></div>';
+  });
+
+  el.innerHTML=html||'<div class="empty">No matches found.</div>';
+  sendHeight();
+}
+
+function filterAssignments(){
+  renderAssignments();
+}
+
+// ── VIEW STATUS ──
+var allLoginCounts={};
+
+async function loadViewStatus(){
+  document.getElementById('viewStatusList').innerHTML='<div class="empty"><span class="spinner"></span> Loading...</div>';
+  document.getElementById('allFilesList').innerHTML='<div class="empty"><span class="spinner"></span> Loading...</div>';
+  document.getElementById('loginCountList').innerHTML='<div class="empty"><span class="spinner"></span> Loading...</div>';
+  try{
+    var [filesRes, viewsRes, lcRes] = await Promise.all([
+      fetch(API_URL+'?action=getAllFiles&token='+encodeURIComponent(token)),
+      fetch(API_URL+'?action=getAllFileViews&token='+encodeURIComponent(token)),
+      fetch(API_URL+'?action=getLoginCounts&token='+encodeURIComponent(token))
+    ]);
+    var fj=await filesRes.json(), vj=await viewsRes.json(), lj=await lcRes.json();
+    allFiles=fj.files||[];
+    allFileViews=vj.views||[];
+    allLoginCounts=lj.counts||{};
+    renderAllFilesList();
+    renderViewStatus(allStudents);
+    renderLoginCounts(allStudents);
+  }catch(e){
+    document.getElementById('viewStatusList').innerHTML='<div class="empty">Connection error.</div>';
+    document.getElementById('allFilesList').innerHTML='<div class="empty">Connection error.</div>';
+    document.getElementById('loginCountList').innerHTML='<div class="empty">Connection error.</div>';
+  }
+}
+
+function renderAllFilesList(){
+  var el=document.getElementById('allFilesList');
+  if(!allFiles.length){el.innerHTML='<div class="empty">No files registered yet.</div>';sendHeight();return;}
+  el.innerHTML=allFiles.map(function(f){
+    var fid=String(f.fileId||'').replace(/'/g,"\\'");
+    var nm=String(f.fileName||'').replace(/'/g,"\\'");
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;margin-bottom:7px;">'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-size:.88rem;color:#e8f0fb;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(f.fileName)+'</div>'+
+        '<div style="font-size:.68rem;color:#5a7a9a;margin-top:2px;">'+esc(f.className)+' · '+fmtDate(f.uploadDate)+'</div>'+
+      '</div>'+
+      '<a href="'+esc(f.driveUrl)+'" target="_blank" class="btn btn-outline btn-sm">View</a>'+
+      '<button class="btn btn-danger btn-sm" onclick="doDeactivateFile(\''+fid+'\',\''+nm+'\')">✕ Remove</button>'+
+    '</div>';
+  }).join('');
+  sendHeight();
+}
+
+async function doDeactivateFile(fileId,fileName){
+  var ok=await gpnConfirm('🗑️','Remove File?','Remove "'+fileName+'" from student view?\nStudents will no longer see this file.\n(Data is kept in sheet, just hidden)','Yes, Remove','btn-danger');
+  if(!ok)return;
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'deactivateFile',fileId:fileId,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('regFileMsg','✓ File removed from student view.','success');loadViewStatus();}
+    else await gpnConfirm('❌','Error',j.message,'OK','btn-outline');
+  }catch(e){await gpnConfirm('❌','Error','Connection error','OK','btn-outline');}
+}
+
+function renderViewStatus(students){
+  var el=document.getElementById('viewStatusList');
+  var active=students.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';});
+  if(!active.length){el.innerHTML='<div class="empty">No students loaded.</div>';sendHeight();return;}
+  if(!allFiles.length){el.innerHTML='<div class="empty">No files registered yet. Register a file above.</div>';sendHeight();return;}
+  el.innerHTML=active.map(function(s){
+    var studentFiles=allFiles.filter(function(f){return String(f.className||'').trim()===String(s.cls||'').trim();});
+    var viewedCount=0;
+    studentFiles.forEach(function(f){
+      if(allFileViews.some(function(v){return v.studentId===s.id&&v.fileId===f.fileId&&v.viewed;})) viewedCount++;
+    });
+    var unseen=studentFiles.length-viewedCount;
+    var countClass=unseen>0?'unseen':'allseen';
+    var countTxt=studentFiles.length===0?'No files':unseen+' unseen / '+studentFiles.length+' total';
+    return '<div class="file-stat-row">'+
+      '<div class="fsr-info"><div class="fsr-name">'+esc(s.name)+'</div><div class="fsr-id">'+esc(s.id)+' · '+esc(s.cls)+'</div></div>'+
+      '<div class="fsr-count '+countClass+'">'+countTxt+'</div>'+
+    '</div>';
+  }).join('');
+  sendHeight();
+}
+
+function renderLoginCounts(students){
+  var el=document.getElementById('loginCountList');
+  var active=students.filter(function(s){return String(s.status||'').toLowerCase()!=='inactive';});
+  if(!active.length){el.innerHTML='<div class="empty">No students loaded.</div>';sendHeight();return;}
+  // Sort by login count descending
+  var sorted=active.slice().sort(function(a,b){return (allLoginCounts[b.id]||0)-(allLoginCounts[a.id]||0);});
+  var q=document.getElementById('lcSearch')?document.getElementById('lcSearch').value.toLowerCase():'';
+  if(q)sorted=sorted.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.id||'').toLowerCase().includes(q);});
+  el.innerHTML=sorted.map(function(s){
+    var count=allLoginCounts[s.id]||0;
+    var countColor=count>=10?'#69ff47':count>=3?'#ffd54f':'#7a95b0';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(8,18,38,0.55);border:1px solid rgba(30,58,95,.7);border-radius:10px;margin-bottom:6px;">'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-size:.88rem;color:#e8f0fb;font-weight:600;">'+esc(s.name)+'</div>'+
+        '<div style="font-size:.68rem;color:#5a7a9a;margin-top:2px;">'+esc(s.id)+' · '+esc(s.cls)+'</div>'+
+      '</div>'+
+      '<div style="font-family:Rajdhani,sans-serif;font-size:1.1rem;font-weight:700;color:'+countColor+';">'+count+'</div>'+
+      '<div style="font-size:.65rem;color:#5a7a9a;">logins</div>'+
+    '</div>';
+  }).join('');
+  sendHeight();
+}
+
+function filterLoginCounts(){renderLoginCounts(allStudents);}
+
+function filterViewStatus(){
+  var q=document.getElementById('vsSearch').value.toLowerCase();
+  var list=q?allStudents.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.id||'').toLowerCase().includes(q);}):allStudents;
+  renderViewStatus(list);
+}
+
+async function registerFile(){
+  var fname=document.getElementById('reg_fname').value.trim();
+  var cls=document.getElementById('reg_class').value;
+  var url=document.getElementById('reg_url').value.trim();
+  if(!fname||!url){showMsg('regFileMsg','File name and URL are required.','error');return;}
+  setBtns(['btnRegFile'],true);showMsg('regFileMsg','Registering...','loading');
+  try{
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'registerFile',fileName:fname,className:cls,driveUrl:url,token:token})});
+    var j=await res.json();
+    if(j.status==='success'){showMsg('regFileMsg','✓ File registered.','success');document.getElementById('reg_fname').value='';document.getElementById('reg_url').value='';loadViewStatus();}
+    else showMsg('regFileMsg',j.message,'error');
+  }catch(e){showMsg('regFileMsg','Connection error','error');}
+  finally{setBtns(['btnRegFile'],false);}
+}
+
+// ── SHARED ──
+function showMsg(id,text,type){
+  var el=document.getElementById(id);if(!el)return;
+  if(!text){el.style.display='none';return;}
+  el.className='status-msg '+type;el.style.display='block';
+  el.innerHTML=type==='loading'?'<span class="spinner"></span>'+text:text;
+}
+
+function logout(){
+  fetch(API_URL,{method:'POST',body:JSON.stringify({action:'logout',token:token})}).catch(function(){});
+  sessionStorage.removeItem('gpn_admin');sessionStorage.removeItem('gpn_token');window.location.assign('index.html');
+}
+
+function sendHeight(){
+  var topBar=document.querySelector('.top-bar');
+  var active=document.querySelector('.section.active');
+  if(topBar&&active)window.parent.postMessage({type:'gpn-resize',height:topBar.offsetHeight+active.scrollHeight+140},'*');
+}
+window.addEventListener('load',sendHeight);
+window.addEventListener('resize',sendHeight);
+new MutationObserver(function(){setTimeout(sendHeight,100);}).observe(document.body,{childList:true,subtree:true});
+
+loadStudents();
+loadLeaderboardAll();
+</script>
+</body>
+</html>
